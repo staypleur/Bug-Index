@@ -1,0 +1,5 @@
+collector.test.js
+runtime.test.js
+.vscode/**
+node_modules/**
+*.vsix

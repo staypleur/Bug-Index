@@ -1,0 +1,25 @@
+{
+  "name": "bug-index",
+  "displayName": "Bug Index",
+  "description": "Collect C, Python and Java terminal errors in your personal Bug Index.",
+  "version": "0.1.0",
+  "publisher": "staypleur",
+  "license": "UNLICENSED",
+  "repository": { "type": "git", "url": "https://github.com/staypleur/Bug-Index.git", "directory": "extension" },
+  "engines": { "vscode": "^1.93.0" },
+  "categories": ["Other"],
+  "main": "./extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "capabilities": { "untrustedWorkspaces": { "supported": false } },
+  "contributes": {
+    "commands": [
+      { "command": "bugIndex.connect", "title": "Bug Index: Connect" },
+      { "command": "bugIndex.enable", "title": "Bug Index: Enable Collection" },
+      { "command": "bugIndex.disable", "title": "Bug Index: Disable Collection" },
+      { "command": "bugIndex.retry", "title": "Bug Index: Retry Pending Captures" },
+      { "command": "bugIndex.clear", "title": "Bug Index: Clear Pending Captures" },
+      { "command": "bugIndex.disconnect", "title": "Bug Index: Disconnect" }
+    ]
+  },
+  "scripts": { "test": "node --test *.test.js", "package": "npx @vscode/vsce package" }
+}

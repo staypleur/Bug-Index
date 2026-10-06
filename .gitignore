@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+data/
+backups/
+artifacts/
+*.sqlite*
+*.vsix
+node_modules/
+.pytest_cache/
+.pytest_tmp*/
