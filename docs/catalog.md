@@ -1,6 +1,6 @@
-# 오류 분류 v0.3
+# 오류 분류 v0.4
 
-9,819개 지원 항목: C 54개 / Python 9,671개 / Java 94개.
+27,990개 지원 항목: C 54개 / Python 9,671개 / Java 18,265개.
 여기에는 메시지를 세분화할 수 없는 경우를 위한 통합 분류도 포함됩니다.
 모든 항목에 이름, 고정 ID, 계열 ID, 진단 패턴, 대표 로그 fixture, 참고 문서가 있습니다.
 라이브러리별 정적 메시지 유형을 구분하며, 라이브러리·예외 클래스·값을 제거한 메시지 템플릿이 같은 항목은 중복 집계하지 않습니다.
@@ -8,6 +8,19 @@
 Segmentation Fault를 NULL 역참조라고 추측하는 식의 분류는 하지 않습니다.
 
 ## 외부 라이브러리
+
+Java 중심 확장으로 Java 18,265개를 지원합니다. 이 중 18,133개는 공식 소스에서 추출한 메시지 템플릿입니다.
+OpenJDK 6,051 / Android 4,523 / Spring 2,794 / Spring Boot 1,046 / Gradle 1,207 / Maven 237 / Hibernate 1,422 / Netty 655 / Guava 198개입니다.
+Jackson은 현재 안전하게 추출할 수 있는 표준 예외 메시지가 없어 추가 항목이 없습니다.
+아래 표는 기존 Python 및 문서화된 Java 예외 항목이며, 위 메시지 템플릿이 추가됩니다.
+
+Java AST의 실제 `throw new`와 확인된 Assert/Preconditions/Objects 호출만 읽습니다.
+표준 예외의 문자열 생성자를 사용하고, 사용자 정의 생성자·동적 메시지 생성기·텍스트 블록은 추측하지 않습니다.
+Java 세부 항목은 스택의 첫 발생 지점이 해당 라이브러리인지 확인합니다. 확인된 검증 도우미 프레임은 건너뜁니다.
+JDK 모듈 접두사와 생성자 프레임, AndroidRuntime Logcat 접두사, Maven `[ERROR]` 접두사를 지원합니다.
+Android 범위는 framework의 core/java, graphics/java, media/java, telephony/java입니다. Android 전체 오류 목록은 아닙니다.
+각 소스의 SHA와 아카이브 해시는 [java-catalog-sources.json](java-catalog-sources.json)에 있습니다.
+템플릿 검증은 전체 Android 기기나 라이브러리를 실제 실행했다는 의미가 아닙니다.
 
 | 대상 | 세부 항목 수 |
 | --- | ---: |
@@ -97,6 +110,8 @@ NumPy·pandas의 실제 traceback 8개도 테스트하며 CI는 고정된 두 �
 5. 기존 로그와 겹칠 수 있는 패턴은 실제 실행 결과와 오탐 예제로 확인합니다.
 
 Python 라이브러리를 추가할 때는 `scripts/import_library_catalog.py`의 공식 저장소 목록을 확장하고 명시적으로 실행합니다.
+Java는 `pip install -r requirements-dev.txt` 후 `python -m scripts.import_java_catalog`로 갱신합니다.
+Windows 안정성을 위해 Tree-sitter 0.25.2와 Java grammar 0.23.5를 고정했습니다.
 도구는 원격 소스를 AST로 읽으며 실행하지 않습니다. 내려받은 자료는 ignored `artifacts/catalog-sources`에 보관합니다.
 이미 공개한 ID와 템플릿은 다시 번호를 매기거나 제거하지 않습니다. upstream에서 제거된 오류도 이전 버전 사용자에게 필요하므로 유지합니다.
 

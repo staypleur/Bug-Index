@@ -1,7 +1,7 @@
 # Bug Index for VS Code
 
 C, Python, Java 터미널 오류를 개인 Bug Index 도감에 기록합니다.
-v0.3은 9,819개 도감 항목과 traceback/stack trace 기반 미분류 발견을 지원합니다.
+v0.4은 27,990개 도감 항목과 traceback/stack trace 기반 미분류 발견을 지원합니다.
 Python 라이브러리의 세부 분류에는 오류 한 줄뿐 아니라 라이브러리 경로가 포함된 traceback이 필요합니다.
 
 ## 시작
@@ -13,6 +13,10 @@ Python 라이브러리의 세부 분류에는 오류 한 줄뿐 아니라 라이
 5. VS Code 통합 터미널에서 프로그램을 실행합니다.
 
 VS Code 1.93 이상과 터미널 셸 통합이 필요합니다. Debug Console은 수집하지 않습니다.
+Java 라이브러리 세부 분류에는 발생 지점이 포함된 stack trace가 필요합니다.
+Gradle은 `./gradlew build --stacktrace`, Android는 `adb logcat -b crash -d -v threadtime`을 통합 터미널에서 실행합니다.
+명령 종료 후 수집하므로 계속 실행되는 `adb logcat`은 종료하기 전까지 전송하지 않습니다.
+Android 기기의 USB 디버깅과 adb 설치·연결은 별도로 필요합니다.
 수집은 기본적으로 꺼져 있고, 작업 공간마다 따로 켭니다.
 
 ## 데이터

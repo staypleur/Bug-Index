@@ -1,0 +1,135 @@
+[
+  {
+    "package": "OpenJDK",
+    "repository": "openjdk/jdk",
+    "commit": "4c93efe5c46aeae7a470406bf68138a813a6daf3",
+    "scope": [
+      "src"
+    ],
+    "archive_sha256": "b101b0e267f3a5a3db35a63355212136e8c644dcfb4741878210b69bc194cf1f",
+    "license": "docs/catalog-licenses/OpenJDK.txt",
+    "templates": 6051,
+    "parsed_files": 5516,
+    "skipped_files": 15
+  },
+  {
+    "package": "Android",
+    "repository": "aosp-mirror/platform_frameworks_base",
+    "commit": "1cdfff555f4a21f71ccc978290e2e212e2f8b168",
+    "scope": [
+      "core/java",
+      "graphics/java",
+      "media/java",
+      "telephony/java"
+    ],
+    "archive_sha256": "b13d67c20c16bdf74192dd781c3fb01d1ce659ea8353aa8e18ade229ae5ecdcf",
+    "license": "docs/catalog-licenses/Android.txt",
+    "templates": 4523,
+    "parsed_files": 2112,
+    "skipped_files": 0
+  },
+  {
+    "package": "Spring",
+    "repository": "spring-projects/spring-framework",
+    "commit": "9998a5bbebd3176e4df5acd55dbe30eb28bc2505",
+    "scope": [
+      "src/main/java"
+    ],
+    "archive_sha256": "771e7612ef3507f3d1a1f063a90a8a2bd5c99d1bda94c5c645848b94fb7fb26f",
+    "license": "docs/catalog-licenses/Spring.txt",
+    "templates": 2794,
+    "parsed_files": 2043,
+    "skipped_files": 44
+  },
+  {
+    "package": "Spring Boot",
+    "repository": "spring-projects/spring-boot",
+    "commit": "66af0dccbe3925ce5c84d37bf2e4ae9aff8e17e2",
+    "scope": [
+      "src/main/java"
+    ],
+    "archive_sha256": "cac3525b2d9af00ace3305346d37a5f44dd907b10236388666a569f5493d39fb",
+    "license": "docs/catalog-licenses/Spring Boot.txt",
+    "templates": 1046,
+    "parsed_files": 1033,
+    "skipped_files": 8
+  },
+  {
+    "package": "Gradle",
+    "repository": "gradle/gradle",
+    "commit": "61b05737d5ecbab64590d6a30dc7927c9188ce0d",
+    "scope": [
+      "src/main/java"
+    ],
+    "archive_sha256": "b178e4962cd09b51123b4365fddf12db58032850db0c256480a4f38d051dbe03",
+    "license": "docs/catalog-licenses/Gradle.txt",
+    "templates": 1207,
+    "parsed_files": 1717,
+    "skipped_files": 0
+  },
+  {
+    "package": "Maven",
+    "repository": "apache/maven",
+    "commit": "c74bba845d6407a1b24886f86b807c52d0e05ef1",
+    "scope": [
+      "src/main/java"
+    ],
+    "archive_sha256": "2fb9ab51dd769cfc5a63691b8676b0937825ecdd0c1f765bdfe438aed9c037f7",
+    "license": "docs/catalog-licenses/Maven.txt",
+    "templates": 237,
+    "parsed_files": 470,
+    "skipped_files": 0
+  },
+  {
+    "package": "Hibernate",
+    "repository": "hibernate/hibernate-orm",
+    "commit": "c1b397b935a3475d550a4af400c51b93016aa9cb",
+    "scope": [
+      "src/main/java"
+    ],
+    "archive_sha256": "f7cb9d9600210b1b3f68b7007389c190e6ab21d6366573b83f3562e395fff68c",
+    "license": "docs/catalog-licenses/Hibernate.txt",
+    "templates": 1422,
+    "parsed_files": 1944,
+    "skipped_files": 0
+  },
+  {
+    "package": "Netty",
+    "repository": "netty/netty",
+    "commit": "014ef8d7031f9f1015020095421a659ced36cc8a",
+    "scope": [
+      "src/main/java"
+    ],
+    "archive_sha256": "a2207ec763690ab9d178491eba041560215a8247c77f1020ea69a04b3ebfc08d",
+    "license": "docs/catalog-licenses/Netty.txt",
+    "templates": 655,
+    "parsed_files": 797,
+    "skipped_files": 2
+  },
+  {
+    "package": "Jackson",
+    "repository": "FasterXML/jackson-databind",
+    "commit": "26e12c98d793b2d609b663a4a90eec2bcfb4f3bd",
+    "scope": [
+      "src/main/java"
+    ],
+    "archive_sha256": "769ebc734d0fd9574278b367334d41eebe89601de4c33c6d8a48a634b9ca2f54",
+    "license": "docs/catalog-licenses/Jackson.txt",
+    "templates": 0,
+    "parsed_files": 191,
+    "skipped_files": 0
+  },
+  {
+    "package": "Guava",
+    "repository": "google/guava",
+    "commit": "3dab0e877359da2fcf72039b149fa758fa077df6",
+    "scope": [
+      "guava/src"
+    ],
+    "archive_sha256": "17393b1ed225883d575d168070da464cc7b38d73e48dbf589033a2c894a9621b",
+    "license": "docs/catalog-licenses/Guava.txt",
+    "templates": 198,
+    "parsed_files": 392,
+    "skipped_files": 4
+  }
+]

@@ -344,6 +344,39 @@ def catalog():
             entries[-1].update(package=item['package'], context=context, exception=exception,
                                verification='source-template', template_key=item['key'], message_template=message)
 
+    java_path = ROOT / 'server/java_templates.json'
+    family_path = ROOT / 'server/java_families.json'
+    if java_path.exists():
+        families = json.loads(family_path.read_text(encoding='utf-8'))
+        for item in families:
+            if item['id'] in {entry['id'] for entry in entries}:
+                continue
+            qualified, number = item['exception'], item['id']
+            module = 'java.sql' if qualified.startswith('java.sql.') else 'java.naming' if qualified.startswith('javax.naming.') else 'java.base'
+            add(number, qualified, 'Java', 'Runtime', 'Common', '🐞',
+                r'^[ \t]*(?:(?:Exception in thread "[^"\n]+"|Caused by:|Suppressed:)\s+)?' + re.escape(qualified) + r'(?::|$)',
+                f'Exception in thread "main" {qualified}: unspecified', label=qualified.rsplit('.', 1)[-1],
+                source='https://docs.oracle.com/en/java/javase/21/docs/api/' + module + '/' + qualified.replace('.', '/') + '.html')
+        family_ids = {item['exception']: item['id'] for item in families}
+        for item in json.loads(java_path.read_text(encoding='utf-8')):
+            qualified, message, number = item['exception'], item['template'], item['id']
+            chunks = message.split('\x00')
+            pattern = r'[^\n]*?'.join(''.join(r'\s+' if part.isspace() else re.escape(part)
+                                             for part in re.split(r'(\s+)', chunk)) for chunk in chunks)
+            prefixes = item['origin_prefixes']
+            context = r'^[ \t]*at (?:[^\s/]+/)?(?:' + '|'.join(re.escape(prefix) for prefix in prefixes) + ')'
+            sample = f'Exception in thread "main" {qualified}: {message.replace(chr(0), "sample_value")}\n\tat {item["module"]}.Example.run(Example.java:12)'
+            if item.get('kind') == 'precondition-call':
+                sample = sample.replace('\n\tat ', '\n\tat org.springframework.util.Assert.isTrue(Assert.java:12)\n\tat ', 1)
+            add(number, f'{item["package"]}.{qualified}.{item["key"][:12]}', 'Java',
+                'Android' if item['package'] == 'Android' else 'Build' if item['package'] in ('Gradle', 'Maven') else 'Library',
+                'Uncommon', '🪲', r'^[ \t]*(?:(?:Exception in thread "[^"\n]+"|Caused by:|Suppressed:)\s+)?' + re.escape(qualified) + r':[ \t]*' + pattern + r'[ \t]*$',
+                sample, family=family_ids[qualified], label=message.replace('\x00', '…'),
+                priority=200 + min(len(''.join(chunks)), 500), source=item['source'])
+            entries[-1].update(package=item['package'], context=context, exception=qualified,
+                               verification='source-template', template_key=item['key'], message_template=message,
+                               origin_prefixes=prefixes, origin_module=item['module'], kind=item.get('kind', 'throw-statement'))
+
     assert len({e['id'] for e in entries}) == len(entries)
     assert len({(e['language'], e['name']) for e in entries}) == len(entries)
     numbers = {e['id'] for e in entries}
@@ -372,6 +405,13 @@ def main():
             parser.error('Shared diagnostic detectors are out of sync')
     else:
         detector_path.write_text(detectors, encoding='utf-8')
+    prefixes = (ROOT / 'server/diagnostic-prefixes.json').read_text(encoding='utf-8')
+    prefix_path = ROOT / 'extension/diagnostic-prefixes.json'
+    if args.check:
+        if not prefix_path.exists() or prefix_path.read_text(encoding='utf-8') != prefixes:
+            parser.error('Shared diagnostic prefixes are out of sync')
+    else:
+        prefix_path.write_text(prefixes, encoding='utf-8')
     # Path ordering is case-insensitive on Windows, case-sensitive on Linux.
     # Use the same explicit ordering on both hosts so --check is reproducible.
     licenses = sorted((ROOT / 'docs/catalog-licenses').glob('*.txt'), key=lambda path: path.name.casefold())

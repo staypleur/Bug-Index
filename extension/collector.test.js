@@ -1,6 +1,14 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { mask, excerpt, safeUrl } = require('./collector');
+test('Android Logcat prefixes are normalized before collection', () => {
+  for (const prefix of ['10-07 12:34:56.123 123 456 E AndroidRuntime: ', 'E/AndroidRuntime( 123): ']) {
+    const log = excerpt(prefix + 'java.lang.IllegalStateException: rejected state\n' + prefix + '    at android.app.Activity.run(Activity.java:12)');
+    assert.match(log, /IllegalStateException/);
+    assert.match(log, /at android.app.Activity/);
+    assert.ok(!log.includes('AndroidRuntime:'));
+  }
+});
 test('normal output does not create a bug', () => assert.equal(excerpt('Hello world\nexit code 0'), null));
 test('Python trace keeps source frames and hides secrets', () => {
   const log = excerpt('regular console output\nTraceback (most recent call last):\n  File "/Users/alice/app/main.py", line 2, in run\nTypeError: API_KEY=supersecret\n');

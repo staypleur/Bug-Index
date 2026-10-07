@@ -1,0 +1,270 @@
+[
+  {
+    "exception": "java.io.EOFException",
+    "id": 116
+  },
+  {
+    "exception": "java.io.FileNotFoundException",
+    "id": 115
+  },
+  {
+    "exception": "java.io.IOException",
+    "id": 114
+  },
+  {
+    "exception": "java.io.InterruptedIOException",
+    "id": 117
+  },
+  {
+    "exception": "java.io.InvalidObjectException",
+    "id": 60000
+  },
+  {
+    "exception": "java.io.NotSerializableException",
+    "id": 60001
+  },
+  {
+    "exception": "java.io.StreamCorruptedException",
+    "id": 60002
+  },
+  {
+    "exception": "java.io.UnsupportedEncodingException",
+    "id": 60003
+  },
+  {
+    "exception": "java.lang.ArithmeticException",
+    "id": 101
+  },
+  {
+    "exception": "java.lang.ArrayIndexOutOfBoundsException",
+    "id": 2
+  },
+  {
+    "exception": "java.lang.AssertionError",
+    "id": 60004
+  },
+  {
+    "exception": "java.lang.ClassCastException",
+    "id": 102
+  },
+  {
+    "exception": "java.lang.ClassNotFoundException",
+    "id": 3
+  },
+  {
+    "exception": "java.lang.CloneNotSupportedException",
+    "id": 60005
+  },
+  {
+    "exception": "java.lang.Exception",
+    "id": 60006
+  },
+  {
+    "exception": "java.lang.IllegalAccessException",
+    "id": 128
+  },
+  {
+    "exception": "java.lang.IllegalArgumentException",
+    "id": 4
+  },
+  {
+    "exception": "java.lang.IllegalStateException",
+    "id": 109
+  },
+  {
+    "exception": "java.lang.IndexOutOfBoundsException",
+    "id": 103
+  },
+  {
+    "exception": "java.lang.InstantiationException",
+    "id": 130
+  },
+  {
+    "exception": "java.lang.InternalError",
+    "id": 60007
+  },
+  {
+    "exception": "java.lang.LinkageError",
+    "id": 134
+  },
+  {
+    "exception": "java.lang.NoSuchFieldException",
+    "id": 127
+  },
+  {
+    "exception": "java.lang.NoSuchMethodException",
+    "id": 126
+  },
+  {
+    "exception": "java.lang.NullPointerException",
+    "id": 1
+  },
+  {
+    "exception": "java.lang.NumberFormatException",
+    "id": 107
+  },
+  {
+    "exception": "java.lang.OutOfMemoryError",
+    "id": 6
+  },
+  {
+    "exception": "java.lang.RuntimeException",
+    "id": 60008
+  },
+  {
+    "exception": "java.lang.SecurityException",
+    "id": 111
+  },
+  {
+    "exception": "java.lang.StringIndexOutOfBoundsException",
+    "id": 104
+  },
+  {
+    "exception": "java.lang.UnsatisfiedLinkError",
+    "id": 136
+  },
+  {
+    "exception": "java.lang.UnsupportedOperationException",
+    "id": 108
+  },
+  {
+    "exception": "java.net.ConnectException",
+    "id": 121
+  },
+  {
+    "exception": "java.net.MalformedURLException",
+    "id": 123
+  },
+  {
+    "exception": "java.net.ProtocolException",
+    "id": 60009
+  },
+  {
+    "exception": "java.net.SocketException",
+    "id": 119
+  },
+  {
+    "exception": "java.net.UnknownHostException",
+    "id": 122
+  },
+  {
+    "exception": "java.security.AccessControlException",
+    "id": 60010
+  },
+  {
+    "exception": "java.security.GeneralSecurityException",
+    "id": 60011
+  },
+  {
+    "exception": "java.security.InvalidAlgorithmParameterException",
+    "id": 60012
+  },
+  {
+    "exception": "java.security.InvalidKeyException",
+    "id": 60013
+  },
+  {
+    "exception": "java.security.KeyStoreException",
+    "id": 60014
+  },
+  {
+    "exception": "java.security.NoSuchAlgorithmException",
+    "id": 60015
+  },
+  {
+    "exception": "java.security.SignatureException",
+    "id": 60016
+  },
+  {
+    "exception": "java.security.cert.CertificateEncodingException",
+    "id": 60017
+  },
+  {
+    "exception": "java.security.cert.CertificateException",
+    "id": 60018
+  },
+  {
+    "exception": "java.security.cert.CertificateNotYetValidException",
+    "id": 60019
+  },
+  {
+    "exception": "java.security.cert.CertificateParsingException",
+    "id": 60020
+  },
+  {
+    "exception": "java.security.spec.InvalidKeySpecException",
+    "id": 60021
+  },
+  {
+    "exception": "java.sql.SQLException",
+    "id": 60022
+  },
+  {
+    "exception": "java.sql.SQLFeatureNotSupportedException",
+    "id": 60023
+  },
+  {
+    "exception": "java.time.DateTimeException",
+    "id": 60024
+  },
+  {
+    "exception": "java.util.ConcurrentModificationException",
+    "id": 112
+  },
+  {
+    "exception": "java.util.NoSuchElementException",
+    "id": 113
+  },
+  {
+    "exception": "java.util.concurrent.CancellationException",
+    "id": 60025
+  },
+  {
+    "exception": "java.util.concurrent.RejectedExecutionException",
+    "id": 60026
+  },
+  {
+    "exception": "java.util.concurrent.TimeoutException",
+    "id": 60027
+  },
+  {
+    "exception": "javax.crypto.BadPaddingException",
+    "id": 60028
+  },
+  {
+    "exception": "javax.crypto.IllegalBlockSizeException",
+    "id": 60029
+  },
+  {
+    "exception": "javax.crypto.ShortBufferException",
+    "id": 60030
+  },
+  {
+    "exception": "javax.naming.InvalidNameException",
+    "id": 60031
+  },
+  {
+    "exception": "javax.naming.NameNotFoundException",
+    "id": 60032
+  },
+  {
+    "exception": "javax.naming.NamingException",
+    "id": 60033
+  },
+  {
+    "exception": "javax.net.ssl.SSLException",
+    "id": 60034
+  },
+  {
+    "exception": "javax.net.ssl.SSLHandshakeException",
+    "id": 60035
+  },
+  {
+    "exception": "javax.net.ssl.SSLPeerUnverifiedException",
+    "id": 60036
+  },
+  {
+    "exception": "javax.net.ssl.SSLProtocolException",
+    "id": 60037
+  }
+]

@@ -3,6 +3,7 @@
 // running thousands of library regexes just to decide whether to send a log.
 const RULES = require('./errors.json').filter(entry => !entry.context).map(entry => new RegExp(entry.pattern, 'im'));
 const DETECTORS = require('./diagnostics.json').map(entry => ({ rule: new RegExp(entry.pattern, 'm'), context: entry.context ? new RegExp(entry.context, 'm') : null }));
+const PREFIXES = require('./diagnostic-prefixes.json').map(pattern => new RegExp(pattern, 'gm'));
 function mask(text) {
   return text.replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, '')
     .replace(/\bBearer\s+[A-Za-z0-9._~+/=-]+/gi, 'Bearer [REDACTED]')
@@ -14,7 +15,8 @@ function mask(text) {
     .replace(/(?:[A-Z]:[\\/]Users[\\/]|\/Users\/|\/home\/)[^/\\\s"']+/gi, '~/');
 }
 function excerpt(output) {
-  const clean = mask(output.replace(/\r\n/g, '\n'));
+  let clean = mask(output.replace(/\r\n/g, '\n'));
+  for (const prefix of PREFIXES) clean = clean.replace(prefix, '');
   const matches = RULES.map(rule => clean.match(rule)).filter(Boolean);
   for (const detector of DETECTORS) if (!detector.context || detector.context.test(clean)) {
     const match = clean.match(detector.rule);

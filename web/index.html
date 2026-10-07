@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ko">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bug Index — 개발자의 버그 도감</title><link rel="stylesheet" href="/style.css?v=0.3.0"><script defer src="/app.js?v=0.3.0"></script></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bug Index — 개발자의 버그 도감</title><link rel="stylesheet" href="/style.css?v=0.4.0"><script defer src="/app.js?v=0.4.0"></script></head>
 <body>
   <aside class="sidebar">
     <a class="brand" href="/"><span class="brand-icon">▦</span> Bug Index<span class="brand-dot">●</span></a>
@@ -40,7 +40,7 @@
       <div class="panel"><h2>01 / 확장 설치</h2><p>저장소의 <code>extension</code> 폴더에서 확장을 패키징해 VS Code에 설치하세요. 설치 방법은 README에 안내되어 있습니다.</p><h2>02 / 수집 토큰 발급</h2><p>토큰은 한 번만 표시됩니다. VS Code의 <strong>Bug Index: Connect</strong> 명령에 입력하세요. 비밀번호처럼 보관하세요.</p><button id="create-token" class="primary">새 VS Code 토큰 발급</button><div id="token-result" class="hidden"><label>발급된 토큰<input id="new-token" readonly aria-label="발급된 수집 토큰"></label><button id="copy-token" class="quiet">복사하기</button><p>복사한 뒤 이 화면을 벗어나면 다시 볼 수 없습니다.</p></div><h2>03 / 자동 수집 켜기</h2><p>명령 팔레트에서 <strong>Bug Index: Enable Collection</strong>을 실행하세요. 지원되는 셸의 터미널에서 실행한 C, Python, Java 오류가 수집됩니다. 터미널 셸 통합이 필요합니다.</p><p class="muted">전송 전 알려진 비밀 값과 사용자 홈 경로를 마스킹합니다. 민감한 프로젝트에서는 수집을 꺼주세요.</p><h2>활성 수집 토큰</h2><div id="token-list"></div></div>
       <div class="panel"><h2>내 데이터</h2><p>수집 기록과 해결 방법을 JSON으로 내려받을 수 있습니다.</p><a class="quiet" href="/api/export">데이터 내보내기 ↗</a><hr><label class="check"><input type="checkbox" id="ranking-opt-in"> 랭킹에 내 GitHub 사용자명과 점수 공개하기</label><p class="muted">기본은 비공개입니다. 원본 로그와 프로젝트명은 랭킹에 공개되지 않습니다.</p></div>
     </section>
-    <footer>Collect the bugs. Keep the lessons.<span>Bug Index · v0.3</span></footer>
+    <footer>Collect the bugs. Keep the lessons.<span>Bug Index · v0.4</span></footer>
   </main>
   <dialog id="capture-dialog"><form id="capture-form"><div class="dialog-head"><div><span class="eyebrow">NEW ENCOUNTER</span><h2>오류 기록하기</h2></div><button type="button" class="close" data-close="capture-dialog" aria-label="닫기">×</button></div><p>터미널 오류를 붙여 넣으면 지원되는 패턴을 분류합니다.</p><label>프로젝트<input name="project" required maxlength="120" placeholder="my-project"></label><label>대상 언어<select name="language"><option value="">자동 판별</option><option>C</option><option>Python</option><option>Java</option></select></label><label>오류 로그<textarea name="log" required maxlength="32768" rows="9" placeholder="Traceback (most recent call last):&#10;...&#10;TypeError: ..."></textarea></label><p class="muted">알려진 비밀 값은 마스킹됩니다. 전송할 내용은 한 번 더 확인해주세요.</p><button class="primary" type="submit">도감에 기록하기 ↗</button></form></dialog>
   <dialog id="detail-dialog"><div class="dialog-head"><div><span class="eyebrow" id="detail-number"></span><h2 id="detail-title"></h2></div><button class="close" data-close="detail-dialog" aria-label="닫기">×</button></div><p id="detail-summary"></p><div id="detail-cases"></div></dialog>

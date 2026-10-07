@@ -1,0 +1,5 @@
+[
+  "^[ \\t]*(?:\\d{4}-)?\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2}\\.\\d+\\s+\\d+\\s+\\d+\\s+[VDIWEF]\\s+AndroidRuntime:\\s?",
+  "^[ \\t]*[VDIWEF]/AndroidRuntime\\(\\s*\\d+\\):\\s?",
+  "^\\[ERROR\\]\\s+(?=(?:Caused by:|Suppressed:|Exception in thread|at )|(?:[\\w$]+\\.)+[\\w$]*(?:Exception|Error))"
+]

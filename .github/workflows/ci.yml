@@ -12,7 +12,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install -r requirements.lock pytest==9.0.2
+      - run: pip install -r requirements.lock -r requirements-dev.txt
       - name: Install libraries for actual traceback checks
         run: pip install numpy==2.2.6 pandas==2.3.3
       - run: python -m scripts.build_catalog --check

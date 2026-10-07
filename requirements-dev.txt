@@ -1,0 +1,4 @@
+# Only source import and test tools. Not installed in the production container.
+pytest==9.0.2
+tree-sitter==0.25.2
+tree-sitter-java==0.23.5

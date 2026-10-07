@@ -14,6 +14,10 @@ for entry, pattern in RULES:
     if entry.get('context'):
         LIBRARY_RULES.setdefault((entry['context'], entry['exception']), []).append((entry, pattern))
 CONTEXTS = {entry['context']: re.compile(entry['context'], re.M) for entry in CATALOG if entry.get('context')}
+PREFIXES = [re.compile(pattern, re.M) for pattern in json.loads(Path(__file__).with_name('diagnostic-prefixes.json').read_text(encoding='utf-8'))]
+JAVA_TRACE = re.compile(r'^[ \t]*(?:(?:Exception in thread "[^"\n]+"|Caused by:|Suppressed:)\s+)?((?:[\w$]+\.)+[\w$]*(?:Exception|Error))(?::[ \t]*([^\n]*))?$', re.M)
+JAVA_FRAMES = re.compile(r'^[ \t]*at (?:[^\s/]+/)?([\w.$<>]+)\([^\n]+\)', re.M)
+JAVA_HELPER_FRAMES = ('java.util.Objects.requireNonNull', 'org.springframework.util.Assert.', 'com.google.common.base.Preconditions.')
 DETECTORS = [(entry, re.compile(entry['pattern'], re.M), re.compile(entry['context'], re.M) if entry.get('context') else None)
              for entry in json.loads(Path(__file__).with_name('diagnostics.json').read_text(encoding='utf-8'))]
 FIELDS = ('id', 'name', 'language', 'category', 'rarity', 'icon', 'label', 'family_id', 'family_name')
@@ -21,7 +25,7 @@ FIELDS = ('id', 'name', 'language', 'category', 'rarity', 'icon', 'label', 'fami
 
 def diagnostic(raw, language=None):
     """Recognize evidence of an error, without assigning a catalog species."""
-    clean = mask(raw.replace('\r\n', '\n').replace('\r', '\n'))
+    clean = normalize(raw)
     found = []
     for entry, pattern, context in DETECTORS:
         if language and language != entry['language']:
@@ -73,8 +77,15 @@ def mask(text):
     return text[:32768]
 
 
-def classify(raw, language=None):
+def normalize(raw):
     clean = mask(raw.replace('\r\n', '\n').replace('\r', '\n'))
+    for prefix in PREFIXES:
+        clean = prefix.sub('', clean)
+    return clean
+
+
+def classify(raw, language=None):
+    clean = normalize(raw)
     found = []
     contexts = {context for context, pattern in CONTEXTS.items() if pattern.search(clean)}
     exception_names = set(re.findall(r'^[ \t]*(?:[|+]\s*)?(\w+):', clean, re.M))
@@ -91,6 +102,31 @@ def classify(raw, language=None):
                     messages = (match[2], clean[match.start(2):])
                     if any(template_matches(entry['message_template'], message) for message in messages):
                         found.append((clean.count('\n', 0, match.start()), entry['priority'], entry['id']))
+    traces = list(JAVA_TRACE.finditer(clean))
+    for index, trace in enumerate(traces):
+        qualified, message = trace[1], trace[2] or ''
+        end = traces[index + 1].start() if index + 1 < len(traces) else len(clean)
+        continuation = clean[trace.end():end]
+        frames = list(JAVA_FRAMES.finditer(continuation))
+        if not frames:
+            continue  # A Java library origin cannot be inferred from an exception name.
+        message += continuation[:frames[0].start()]
+        names = [frame[1] for frame in frames]
+        for context in contexts:
+            for entry, _ in LIBRARY_RULES.get((context, qualified), ()):
+                if entry['language'] != 'Java' or (language and language != 'Java'):
+                    continue
+                origins = names.copy()
+                if entry.get('kind') == 'precondition-call':
+                    while origins and origins[0].startswith(JAVA_HELPER_FRAMES):
+                        origins.pop(0)
+                if not origins or not origins[0].startswith(tuple(entry['origin_prefixes'])):
+                    continue
+                if template_matches(entry['message_template'], message):
+                    origin = max(len(prefix) for prefix in entry['origin_prefixes'] if origins[0].startswith(prefix))
+                    module = 1000 if origins[0].startswith(entry.get('origin_module', '') + '.') else 0
+                    exact = 1000 if '\x00' not in entry['message_template'] else 0
+                    found.append((clean.count('\n', 0, trace.start()), origin * 10000 + module + exact + entry['priority'], entry['id']))
     for entry, pattern in candidates:
         if language and language != entry['language']:
             continue
@@ -113,7 +149,7 @@ def fingerprint(bug, project):
     # Source locations and functions remain; line numbers, addresses and messages do not.
     log = bug["log"]
     frames = re.findall(r'File "([^"\n]+)", line \d+(?:, in ([^\n]+))?', log)
-    java = re.findall(r"\bat\s+([\w.$]+)\(([^():]+)(?::\d+)?\)", log)
+    java = re.findall(r"\bat\s+(?:[^\s/]+/)?([\w.$<>]+)\(([^():]+)(?::\d+)?\)", log)
     c = re.findall(r"([^\s:]+\.(?:c|h)):\d+(?::\d+)?", log)
     locations = [(file.replace("\\", "/"), fn) for file, fn in frames] + java + [(f, "") for f in c]
     # Without frames, normalized error text distinguishes otherwise unrelated crashes.
