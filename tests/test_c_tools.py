@@ -16,6 +16,9 @@ def test_c_scope_static_codes_unicode_quotes_and_unknown_msvc():
     assert classify('main.cpp:2: error: some C++ diagnostic') is None
     assert classify('main.c:2:1: warning: Null pointer dereference [nullPointer]') is None
     assert classify('main.c(2): warning C4100: unused parameter') is None
+    label = classify("main.c: In function 'main':\nmain.c:1:1: error: label 'absent' used but not defined\n    1 | int main(void) { goto absent; }\n      | ^~~")
+    assert label and label['verification'] == 'source-template'
+    assert label['label'] == "label '…' used but not defined"
 
 
 def test_linker_context_and_variable_values_keep_species():
