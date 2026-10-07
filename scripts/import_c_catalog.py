@@ -113,7 +113,7 @@ def string(node, source):
 
 def gcc_template(message):
     message = message.replace('%<', "'").replace('%>', "'").replace('%%', '\x01')
-    message = re.sub(r'%q(?:[A-Za-z])', "'" + SLOT + "'", message)
+    message = re.sub(r'%q(?:\+|#)?[A-Za-z]', "'" + SLOT + "'", message)
     message = re.sub(r'%(?:\+|#)?(?:z|ll|l|w|h|t)?(?:\.\*|\.\d+)?[A-Za-z]', SLOT, message)
     if '%' in message:
         return None

@@ -30,7 +30,7 @@ def test_linker_context_and_variable_values_keep_species():
 @pytest.mark.parametrize('tool,program,label', [
     ('gcc', 'int main(void) { goto absent; }', 'used but not defined'),
     ('gcc', 'struct A { int field:100; };', 'exceeds its type'),
-    ('clang', '<<<<<<< HEAD\nint main(void) { return 0; }', 'version control conflict marker'),
+    ('clang', '<<<<<<< HEAD\nint a;\n=======\nint b;\n>>>>>>> branch\n', 'version control conflict marker'),
     ('clang', '#define F(x) x\nint value = F(1,2);', 'arguments provided to function-like macro'),
 ])
 def test_actual_new_c_compiler_species(tmp_path, tool, program, label):

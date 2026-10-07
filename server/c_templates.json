@@ -334,10 +334,10 @@
     "id": 200021
   },
   {
-    "key": "0557d13fc41462be5529a82bdec8595ef8808bc3e2d0e8078f51a78c3030c698",
+    "key": "6219e5f67bdabd8ac6cd2e615e59cbaaa59b4a1e83d1a34641f99fc00ec8161f",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "nested function \u0000+D declared but never defined",
+    "template": "nested function '\u0000' declared but never defined",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L1349",
     "sources": [
@@ -426,10 +426,10 @@
     "id": 200027
   },
   {
-    "key": "065f1f4e56c2e41054e071e4ad7fb9ec167b7554986d6706e2a1f2bbfbbf835f",
+    "key": "5ed8a18955061e76a84a798d2d52fce5d667511940a29927d53dba121a5c273f",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "non-thread-local declaration of \u0000+D follows thread-local declaration",
+    "template": "non-thread-local declaration of '\u0000' follows thread-local declaration",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2603",
     "sources": [
@@ -2791,10 +2791,10 @@
     "id": 200181
   },
   {
-    "key": "1e4ce23d98afbf6539647fac96c9611c484d1c7e855aef8f6760bc91bb595bb0",
+    "key": "bf8c9af39f62b67832d6ba26252da42c5fec21272d7704244860470777a447e8",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "prototype for \u0000+D declares fewer arguments than previous old-style definition",
+    "template": "prototype for '\u0000' declares fewer arguments than previous old-style definition",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2033",
     "sources": [
@@ -3321,10 +3321,10 @@
     "id": 200216
   },
   {
-    "key": "2364baab45ec7f449c9f0feaeb742a2a7e9a9e5221b4c9c3b851bb12e2a10d9e",
+    "key": "b9ebcf7db4a9e13d0f65c39dcac7d8d299d081258b571fb459c75f8ccea537fb",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "prototype for \u0000+D declares more arguments than previous old-style definition",
+    "template": "prototype for '\u0000' declares more arguments than previous old-style definition",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2027",
     "sources": [
@@ -3396,10 +3396,10 @@
     "id": 200221
   },
   {
-    "key": "23eafa5d62f221bb14247e12f3dddf874b9fe79eabb327632030716a1e2849f0",
+    "key": "d3ff7b9c3cad59dfd0b802c1b8b10bd3565009520aa0240d9554d92b62187147",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "\u0000+D in declare target directive does not have mappable type",
+    "template": "'\u0000' in declare target directive does not have mappable type",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L6362",
     "sources": [
@@ -3614,10 +3614,10 @@
     "id": 200235
   },
   {
-    "key": "260edad5d60f8f1ee62a5bdfbfa4973df534ab9e836c8ed88ebb227bf57ba1a7",
+    "key": "1d28407e71ef0c4a778e3dbca23d68a9d39ed6b33f8c2e6e44b64deb27b89090",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "conflicting named address spaces (generic vs \u0000) for \u0000+D",
+    "template": "conflicting named address spaces (generic vs \u0000) for '\u0000'",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2333",
     "sources": [
@@ -5473,10 +5473,10 @@
     "id": 200358
   },
   {
-    "key": "3ba6a46351803b513496450aee68b2075c7cf0215b0d8c2e329a685d73df90be",
+    "key": "6e3e120a572fed0fd35cff8dda47c5683c9f7bd82994a9bce0fa560c7a5c00d2",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "non-static declaration of \u0000+D follows static declaration",
+    "template": "non-static declaration of '\u0000' follows static declaration",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2549",
     "sources": [
@@ -5861,10 +5861,10 @@
     "id": 200383
   },
   {
-    "key": "3f7fec649ca4e83d1744869e62b46fe9589a57cb9fbdf7f1bd2c7697f97ed66d",
+    "key": "711ab0dce7c5ca1107d276de1a6187dd87c369f6e979d12f9bafcd0bc08c9e4b",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "conflicting named address spaces (\u0000 vs \u0000) for \u0000+D",
+    "template": "conflicting named address spaces (\u0000 vs \u0000) for '\u0000'",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2341",
     "sources": [
@@ -6345,10 +6345,10 @@
     "id": 200415
   },
   {
-    "key": "45067f5bc19cc9b62bc7c9a4f551e39e33897fa2e88bc8adfe873fe5d5a5c065",
+    "key": "36f36a34ba1dc7516ec38dc8486293147be9b9b3c55fa4adc0fa955a75282edb",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "type of array \u0000+D completed incompatibly with implicit initialization",
+    "template": "type of array '\u0000' completed incompatibly with implicit initialization",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L1392",
     "sources": [
@@ -7188,10 +7188,10 @@
     "id": 200470
   },
   {
-    "key": "4f9bc3d1c4fb0e3a1ae4517e354fe20daf2d035be9980eaf709bf3252f1f29f2",
+    "key": "1483fa4eebf56639870ba6fed5d783d20c91fa8a9f1ab70d4d57ee3d0ee4a704",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "array size missing in \u0000+D",
+    "template": "array size missing in '\u0000'",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L916",
     "sources": [
@@ -7536,10 +7536,10 @@
     "id": 200493
   },
   {
-    "key": "52fe1b3cbc9a6084760afbbba6898d21ecf9bd4b56306b55cac097adece7ec8b",
+    "key": "d47ae40c5059a4c3b00d133f68d7ad3c819644a654b433a054f1721a95a7161d",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "parameter \u0000 (\u0000+D) has incomplete type",
+    "template": "parameter \u0000 ('\u0000') has incomplete type",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L8561",
     "sources": [
@@ -8051,10 +8051,10 @@
     "id": 200527
   },
   {
-    "key": "58e516b2453fa850946d131c17b4c6e8ae8d3b1ca4cd5af77f5d64c519bce462",
+    "key": "4e2ea428fcccbc0456090d6ebc8b442a21dedfd71e3103ccc72edef44f0c8b4c",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "conflicting redeclaration of enumerator \u0000+D",
+    "template": "conflicting redeclaration of enumerator '\u0000'",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2197",
     "sources": [
@@ -8096,10 +8096,10 @@
     "id": 200530
   },
   {
-    "key": "59322bf659817660859bdd8c17106468c36cc6cff8991d3e638fb11d5f0cb6af",
+    "key": "2d4e8e8224953c69c723a0fd625a270a476fb4345db2d2b51537e27068585e25",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "declaration of \u0000+D with no linkage follows extern declaration",
+    "template": "declaration of '\u0000' with no linkage follows extern declaration",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2685",
     "sources": [
@@ -8865,10 +8865,10 @@
     "id": 200581
   },
   {
-    "key": "64643c2b97334007ebafa85b59393ccc719d28ecf6489e4cc1012e84e9bf4ba5",
+    "key": "fc15cfc63668939b9b09f4cead6b2f00f51076f720b25017d546363838f9e772",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "conflicting named address spaces (\u0000 vs generic) for \u0000+D",
+    "template": "conflicting named address spaces (\u0000 vs generic) for '\u0000'",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2337",
     "sources": [
@@ -9892,10 +9892,10 @@
     "id": 200649
   },
   {
-    "key": "6f7e77d8e35225932bed893e6aaa29ee7ea5f8566aab8efd3176e4ec45304595",
+    "key": "16c4ef03a4b417cad7e98fd009dedd51fb6987fb82b5cb33245924cb434bee1e",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "redefinition of \u0000+D",
+    "template": "redefinition of '\u0000'",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2499",
     "sources": [
@@ -10936,10 +10936,10 @@
     "id": 200718
   },
   {
-    "key": "7bc5e0245259b93ccd5c4fc650dc1ea8449b9636f0dccec8d43e89509325492c",
+    "key": "acd5174cfb665365bcf905250d1daaf6a875001bee6b9b3760cd80ab4fef14d7",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "parameter \u0000+D has just a forward declaration",
+    "template": "parameter '\u0000' has just a forward declaration",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L8679",
     "sources": [
@@ -11086,10 +11086,10 @@
     "id": 200728
   },
   {
-    "key": "7e0fe1932df46c9da68c3019725ccc1b508280cab99048f0c8801daaac46864a",
+    "key": "e1ae67aed7f2d99741016df94a41f12f5f7f1c124cf9a4c83ff5fae541fdff23",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "duplicate member \u0000+D",
+    "template": "duplicate member '\u0000'",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L9193",
     "sources": [
@@ -11359,10 +11359,10 @@
     "id": 200745
   },
   {
-    "key": "805e9e6ad68dcec08e0e758b106c7ce4e01ad262855283cb065f41b101a44732",
+    "key": "e2d5904f5c4993684824b928670e480e67909968ee295e5fa68c456aa40fb8a4",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "thread-local declaration of \u0000+D follows non-thread-local declaration",
+    "template": "thread-local declaration of '\u0000' follows non-thread-local declaration",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2600",
     "sources": [
@@ -12275,10 +12275,10 @@
     "id": 200805
   },
   {
-    "key": "8934f2beacea0dc17d1126f986235a18699a533ae549a1eefd7cb0f0a53cf923",
+    "key": "f47d7ad12c55dd62e6d19530b640617fd466d8a184a5a6ad919f7b84918d921e",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "static declaration of \u0000+D follows non-static declaration",
+    "template": "static declaration of '\u0000' follows non-static declaration",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2538",
     "sources": [
@@ -12548,10 +12548,10 @@
     "id": 200823
   },
   {
-    "key": "8bd71c14a49f35355ea04ea83d772145d75f9e61a3deee1be0371af195d771e4",
+    "key": "0873133dda409a7972fa6f9066b8fe63dc2787886a2cb14c90b6f969512be13d",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "initializer fails to determine size of \u0000+D",
+    "template": "initializer fails to determine size of '\u0000'",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L6070",
     "sources": [
@@ -12944,10 +12944,10 @@
     "id": 200849
   },
   {
-    "key": "8e9c7cefdb85b185ba8c8422272c6715f438f8d68e5035ef77c7a06f14e323b7",
+    "key": "8d954cc0a984cf62d9f6ab08d75fb8684e094eef240a600293724b12cc22cc6d",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "redeclaration of \u0000+D with no linkage",
+    "template": "redeclaration of '\u0000' with no linkage",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2692",
     "sources": [
@@ -13262,10 +13262,10 @@
     "id": 200870
   },
   {
-    "key": "919ba26f48978cdbe390a6c6b81d52ed0b69fe23b3491b55f6f5939f9cfeecec",
+    "key": "ec60d5c9aa10322f746ddd0bdaa9e87e3e21458457443b68e9f189804f5943d1",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "\u0000+D redeclared as different kind of symbol",
+    "template": "'\u0000' redeclared as different kind of symbol",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2172",
     "sources": [
@@ -15016,10 +15016,10 @@
     "id": 200986
   },
   {
-    "key": "a54a5afc3ac890d7875d0a397751b82ac425dc4791280a7093058661bfc8153c",
+    "key": "8af943a55b91517675e231e24bb722ad730fef7d11140f06f72d8475e6461695",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "redefinition of typedef \u0000+D with different type",
+    "template": "redefinition of typedef '\u0000' with different type",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2413",
     "sources": [
@@ -15076,10 +15076,10 @@
     "id": 200990
   },
   {
-    "key": "a5903cb7087d2ca6e3eda3f4e0ba02f8b49867084690325cbd12e19783523b21",
+    "key": "230c2c8171f6f30bd1958da103c01b082e4dc1ffb190803bc5cb951adcbd7545",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "conflicting type qualifiers for \u0000+D",
+    "template": "conflicting type qualifiers for '\u0000'",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2350",
     "sources": [
@@ -15304,10 +15304,10 @@
     "id": 201005
   },
   {
-    "key": "a93e8848a142dd896c150b8a4f7f8d67c8b93ef810fd9029ebfba7065bef22fd",
+    "key": "f854e14f34827ef2fc7413171d7464a654924ff38c859b90ec49b301aabfec54",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "label \u0000+D used but not defined",
+    "template": "label '\u0000' used but not defined",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L1304",
     "sources": [
@@ -16083,10 +16083,10 @@
     "id": 201056
   },
   {
-    "key": "b1eebb37d5fdf129e6b955730132966bcb4def13e5e1ac6c53ed3b5a5a65f074",
+    "key": "7d4ebac6f4a64cff0be3744e2e5d3147e534c90e769f7bfa91d78548da5c2c47",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "zero or negative size array \u0000+D",
+    "template": "zero or negative size array '\u0000'",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L6082",
     "sources": [
@@ -16249,10 +16249,10 @@
     "id": 201067
   },
   {
-    "key": "b3a6fb5842b52a9ba3b6e7b64e8940ab3882a3e08f34f4ec8ae80a5fee2c389d",
+    "key": "aac8fe563f12e963f71f7a267ff10ea34fe3db3a912fde0d20ac1b7cc96c28d6",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "redefinition of typedef \u0000+D with variably modified type",
+    "template": "redefinition of typedef '\u0000' with variably modified type",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2426",
     "sources": [
@@ -18932,10 +18932,10 @@
     "id": 201237
   },
   {
-    "key": "d2014dd21a28a9df38bbef19129521ec6d7f7b7a0bbe1cb03e7c253c9a6b8db8",
+    "key": "eb9e5fec6768cc36d011a1a1c4ab37ce1174e4c51accf568668173114f5a0dc0",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "redeclaration of enumerator \u0000+D",
+    "template": "redeclaration of enumerator '\u0000'",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2204",
     "sources": [
@@ -19052,10 +19052,10 @@
     "id": 201245
   },
   {
-    "key": "d379da60df86ce547dc1b9bc8f9104141eaf01014602f9b1b824c32a5dee830f",
+    "key": "fa8eb513a536b5e4f1761a208990ead3ba9d081c5e586125d92b185b3e5caa0f",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "extern declaration of \u0000+D follows declaration with no linkage",
+    "template": "extern declaration of '\u0000' follows declaration with no linkage",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2647",
     "sources": [
@@ -19188,10 +19188,10 @@
     "id": 201254
   },
   {
-    "key": "d506569cf490cf86bdcb1082c6eeaf276e704d94219641d891ff70502ac9ae7e",
+    "key": "b3efe667220a854f01d376744b7e55d39bb60f09e21525b686c3dc5297142208",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "conflicting types for \u0000+D; have '\u0000'",
+    "template": "conflicting types for '\u0000'; have '\u0000'",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2377",
     "sources": [
@@ -19431,10 +19431,10 @@
     "id": 201270
   },
   {
-    "key": "d8bd580168a1fab7b61462f07c457d5af47c54af56d5a8a46e433f6e38665191",
+    "key": "bf902ba2a822d5ee5e19a65e1b59e563dc3ac8cda7c4366a0c1fe374608da539",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "prototype for \u0000+D declares argument \u0000 with incompatible type",
+    "template": "prototype for '\u0000' declares argument \u0000 with incompatible type",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2042",
     "sources": [
@@ -21276,10 +21276,10 @@
     "id": 201392
   },
   {
-    "key": "eefff68c11450050908dfa875f13f03942b2ed2b02c0e48eabdb1dafa3f7951a",
+    "key": "4cddb80bc304666619b7b715d8ae56d3b636958fe6d4722a50be0f800c8f8d9c",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "redefinition of parameter \u0000+D",
+    "template": "redefinition of parameter '\u0000'",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2738",
     "sources": [
@@ -22697,10 +22697,10 @@
     "id": 201486
   },
   {
-    "key": "ffb2abca083aed535c6baeabbec0c5147236e59a1ae40835873cdc7d3e3d2868",
+    "key": "0804743d993d15874e8355ad4c15f4bb30c3d553047680c85dd2c3627b8b16a6",
     "tool": "GCC",
     "kind": "compiler-template",
-    "template": "'gnu_inline' attribute present on \u0000+D",
+    "template": "'gnu_inline' attribute present on '\u0000'",
     "code": null,
     "source": "https://github.com/gcc-mirror/gcc/blob/302af96357ff5e3a660e9441166e8c1f1966f45a/gcc/c/c-decl.cc#L2574",
     "sources": [

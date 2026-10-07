@@ -5,6 +5,7 @@ def test_gcc_ast_reads_errors_and_normalizes_format_arguments():
     source = '''void run() { error_at(loc, "invalid operands to %<%s%> for %qT", op, type); warning_at(loc, 0, "a warning"); const char *docs = "error(\\\"not executable\\\")"; }'''
     assert gcc_calls(source)[0][0] == "invalid operands to '\x00' for '\x00'"
     assert len(gcc_calls(source)) == 1
+    assert gcc_calls('void run() { error("label %q+D used but not defined", decl); }')[0][0] == "label '\x00' used but not defined"
     assert gcc_calls('void c_parser_objc_method() { error("expected class name"); }') == []
     assert gcc_calls('void run() { if (c_dialect_objc()) error("expected Objective-C name"); }') == []
     assert gcc_calls('void run() { error(dynamicMessage()); }') == []
