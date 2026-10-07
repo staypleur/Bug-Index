@@ -1,6 +1,23 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { mask, excerpt, safeUrl } = require('./collector');
+const { mask, excerpt, safeUrl, languageHint } = require('./collector');
+test('C command hints support quoted Windows tools and reject C++ or echo', () => {
+  assert.equal(languageHint('gcc main.c -o app'), 'C');
+  assert.equal(languageHint('& "C:\\Program Files\\LLVM\\bin\\clang.exe" "my app.c"'), 'C');
+  assert.equal(languageHint('cl.exe /TC main.c'), 'C');
+  assert.equal(languageHint('cppcheck --language=c src'), 'C');
+  assert.equal(languageHint('gcc main.c other.cpp'), undefined);
+  assert.equal(languageHint('echo gcc main.c'), undefined);
+  assert.equal(languageHint('javac Main.java'), undefined);
+});
+test('C-only linker output needs a C command or source context', () => {
+  assert.equal(excerpt('ld.lld: error: cannot open input file missing.o'), null);
+  assert.match(excerpt('ld.lld: error: cannot open input file missing.o', 'C'), /ld.lld/);
+  assert.match(excerpt('main.c\nmain.obj : error LNK2019: unresolved external symbol absent'), /LNK2019/);
+  assert.match(excerpt('main.c(2): error C2065: absent: undeclared identifier'), /C2065/);
+  assert.equal(excerpt('main.cpp(2): error C2065: absent: undeclared identifier'), null);
+  assert.equal(excerpt('main.c(2): warning C4100: unused parameter'), null);
+});
 test('Android Logcat prefixes are normalized before collection', () => {
   for (const prefix of ['10-07 12:34:56.123 123 456 E AndroidRuntime: ', 'E/AndroidRuntime( 123): ']) {
     const log = excerpt(prefix + 'java.lang.IllegalStateException: rejected state\n' + prefix + '    at android.app.Activity.run(Activity.java:12)');

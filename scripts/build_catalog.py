@@ -234,8 +234,8 @@ def catalog():
         (179, 'UndeclaredName', '선언되지 않은 이름', r'.+ undeclared|use of undeclared identifier', "'value' undeclared (first use in this function)"),
         (180, 'MissingHeader', '헤더 파일을 찾지 못함', r'.+\.h: No such file or directory|.+\.h[’\']? file not found', 'missing.h: No such file or directory'),
         (181, 'UnknownType', '알 수 없는 타입 이름', r'unknown type name', "unknown type name 'Thing'"),
-        (182, 'TooFewArguments', '함수 인자 부족', r'too few arguments', "too few arguments to function 'run'"),
-        (183, 'TooManyArguments', '함수 인자 초과', r'too many arguments', "too many arguments to function 'run'"),
+        (182, 'TooFewArguments', '함수 인자 부족', r'too few arguments (?:to function|in function)', "too few arguments to function 'run'"),
+        (183, 'TooManyArguments', '함수 인자 초과', r'too many arguments (?:to function|in function)', "too many arguments to function 'run'"),
         (184, 'ConflictingTypes', '선언과 정의의 타입 충돌', r'conflicting types for', "conflicting types for 'run'"),
         (185, 'Redefinition', '이름 중복 정의', r'redefinition of', "redefinition of 'value'"),
         (186, 'ExpectedExpression', '표현식 누락', r'expected expression', "expected expression before ')' token"),
@@ -377,6 +377,8 @@ def catalog():
                                verification='source-template', template_key=item['key'], message_template=message,
                                origin_prefixes=prefixes, origin_module=item['module'], kind=item.get('kind', 'throw-statement'))
 
+    from scripts.c_catalog_data import c_entries
+    entries.extend(c_entries(entries))
     assert len({e['id'] for e in entries}) == len(entries)
     assert len({(e['language'], e['name']) for e in entries}) == len(entries)
     numbers = {e['id'] for e in entries}

@@ -1,0 +1,302 @@
+[
+  {
+    "tool": "GCC",
+    "repository": "gcc-mirror/gcc",
+    "commit": "302af96357ff5e3a660e9441166e8c1f1966f45a",
+    "definitions": 871,
+    "files": [
+      {
+        "tool": "GCC",
+        "path": "gcc/c/c-aux-info.cc",
+        "sha256": "d81cc9e49eee7cb2fc464bc8f1323cc31ccd2ac371519898cd34d35e907989ca"
+      },
+      {
+        "tool": "GCC",
+        "path": "gcc/c/c-convert.cc",
+        "sha256": "e10c6aca69ff3c493250e588955a2088a700f864bad3a0052d00dc5f558820ed"
+      },
+      {
+        "tool": "GCC",
+        "path": "gcc/c/c-decl.cc",
+        "sha256": "6dc2cc81a922d4dac62e1e0cebadf522638364c33ede574a102b51aeeefb8002"
+      },
+      {
+        "tool": "GCC",
+        "path": "gcc/c/c-errors.cc",
+        "sha256": "b555b9c4f2a2817a2f6734697edfd35e4230896306c7414bc0f72e84e8f04f8e"
+      },
+      {
+        "tool": "GCC",
+        "path": "gcc/c/c-fold.cc",
+        "sha256": "c6eec40f51eff310ef40625699700e3f38dbb402bbaff015249c395c5b482d8a"
+      },
+      {
+        "tool": "GCC",
+        "path": "gcc/c/c-lang.cc",
+        "sha256": "019ac8cfeac82ae21e4819c67f2ef67dc9efc3b72bc9cc9167932e398698bef1"
+      },
+      {
+        "tool": "GCC",
+        "path": "gcc/c/c-objc-common.cc",
+        "sha256": "cc3497f858214cf2833b36eaa13f4434728aab1c891919456ca20f8fe38757ac"
+      },
+      {
+        "tool": "GCC",
+        "path": "gcc/c/c-parser.cc",
+        "sha256": "6353eafdb4ff3a45de33ad61fd0aef0fc74ec78f5ff7f4e0bd85a6b733303e8e"
+      },
+      {
+        "tool": "GCC",
+        "path": "gcc/c/c-typeck.cc",
+        "sha256": "5f7f07c7b05fcaf9e8bf4f9dc18ff6085aacb79f49ddb5a795c90230dcf992d4"
+      },
+      {
+        "tool": "GCC",
+        "path": "gcc/c/gccspec.cc",
+        "sha256": "44c13f1fcc593d1987fbfc3af811754a6ab99af199a7f3641cd606326c80f712"
+      },
+      {
+        "tool": "GCC",
+        "path": "gcc/c/gimple-parser.cc",
+        "sha256": "89901b09ec7f0a2dacb7499a963edcbd700962c78e124c41203bb0026fd9d1bd"
+      }
+    ],
+    "license": "docs/catalog-licenses/C-GCC.txt"
+  },
+  {
+    "tool": "Clang",
+    "repository": "llvm/llvm-project",
+    "commit": "bd1c9e3efed65cfcc137a183450e56dac3eb9ff4",
+    "definitions": 224,
+    "files": [
+      {
+        "tool": "Clang",
+        "path": "clang/include/clang/Basic/DiagnosticLexKinds.td",
+        "sha256": "c2dbbf8148a76f6d409877b44941644261eca0ca0f05f1c3969a3f4791bd7555"
+      },
+      {
+        "tool": "Clang",
+        "path": "clang/include/clang/Basic/DiagnosticParseKinds.td",
+        "sha256": "ad65acbc1f783f6193769295856c62babdf941e1af44278d329be4f0bfe90ec7"
+      },
+      {
+        "tool": "Clang",
+        "path": "compiler-rt/lib/asan/asan_errors.cpp",
+        "sha256": "c366cda502973db0be7d0187598fc3d87e23f480ab16408c1d42ab3595f3b7e6"
+      },
+      {
+        "tool": "Clang",
+        "path": "compiler-rt/lib/ubsan/ubsan_handlers.cpp",
+        "sha256": "e776c4f049d94bd8200b1329dca71e71a86d1243b4fd2e7507a850ea631fbb0c"
+      }
+    ],
+    "license": "docs/catalog-licenses/C-Clang.txt"
+  },
+  {
+    "tool": "Cppcheck",
+    "repository": "cppcheck-opensource/cppcheck",
+    "commit": "9c1b4eb232f4ddac74652dec8c9d7e251ba218a2",
+    "definitions": 36,
+    "files": [
+      {
+        "tool": "Cppcheck",
+        "path": "lib/checkbufferoverrun.cpp",
+        "sha256": "b24144b9c4a076d2f6a14d90a26812b084eee3713365110a4161bc8daea9c152"
+      },
+      {
+        "tool": "Cppcheck",
+        "path": "lib/checkmemoryleak.cpp",
+        "sha256": "f68fe1eb0b382572144ad720c0c89f715ddaadcde04b3e4eb08f8ca34a1883b7"
+      },
+      {
+        "tool": "Cppcheck",
+        "path": "lib/checknullpointer.cpp",
+        "sha256": "b887a55f435ac6470142675cf07be77343869d0f923f6fb891d18b4805c6b818"
+      },
+      {
+        "tool": "Cppcheck",
+        "path": "lib/checkuninitvar.cpp",
+        "sha256": "bc766fee46f755fd86be56dedf8d941805b15fb71b98969cc87de493170327e9"
+      },
+      {
+        "tool": "Cppcheck",
+        "path": "lib/checkfunctions.cpp",
+        "sha256": "95389ef9450c7ec1ab741fa1b53dd1ceabd63b4c1d3a41d1424e985c01288a9f"
+      },
+      {
+        "tool": "Cppcheck",
+        "path": "lib/checkother.cpp",
+        "sha256": "1f3014ef65f02c396fd8a7731e105e4b0b85b2e8a14f79b5b69d72001b3e0663"
+      },
+      {
+        "tool": "Cppcheck",
+        "path": "lib/checkstring.cpp",
+        "sha256": "0bf4d8fc1bc1aeb9e09c104d8930d25015aec0a2d5f75dab2435307a9cd3d66b"
+      },
+      {
+        "tool": "Cppcheck",
+        "path": "lib/checktype.cpp",
+        "sha256": "e45d6017da466bb392eb69140b100de241e6af660411b68e6c7c52876582fa6f"
+      },
+      {
+        "tool": "Cppcheck",
+        "path": "lib/check64bit.cpp",
+        "sha256": "6386932bd255b2409ae9b13e07ac1caf606e93db8afdbe0969d3a4386661a08c"
+      },
+      {
+        "tool": "Cppcheck",
+        "path": "lib/checkvaarg.cpp",
+        "sha256": "a9ee4e9bb323d6613a237ac00c50aacc1d0213a7dd4e42e71df3345d9d78c268"
+      },
+      {
+        "tool": "Cppcheck",
+        "path": "lib/checkio.cpp",
+        "sha256": "87f087c9d0a78306f7169f29e0936285f65f1b5d7e09fb80f80cea28e8a07d5b"
+      },
+      {
+        "tool": "Cppcheck",
+        "path": "lib/checksizeof.cpp",
+        "sha256": "4026a015103899c4e2352d786eef0ad64a03e4bff3118b002149ff6fcf2951dd"
+      }
+    ],
+    "license": "docs/catalog-licenses/C-Cppcheck.txt"
+  },
+  {
+    "tool": "MSVC",
+    "repository": "MicrosoftDocs/cpp-docs",
+    "commit": "d60f66970c0eea43aed9addf362da88747c9d154",
+    "definitions": 235,
+    "files": [
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/compiler-errors-1/compiler-errors-c2001-through-c2099.md",
+        "sha256": "d2b762c6e223a0c4342a008677280bb31a06fa7a23a11128cb48bdbcadccf1db"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/compiler-errors-1/compiler-errors-c2100-through-c2199.md",
+        "sha256": "bd729e9dd314350013f6c5e9306397746da6cb62614b6a366d4767c5b675b69c"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/compiler-errors-1/compiler-errors-c2200-through-c2299.md",
+        "sha256": "c3c9baab1ba84a94134987fdccdeed95190e6ae4d0e54c10f6f22d228e5124b1"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/compiler-errors-1/compiler-fatal-errors-c999-through-c1999.md",
+        "sha256": "67827127c19c783363eaaae9931b72079c03a457d46f0040ea404e8f3928a9b4"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/tool-errors/linker-tools-error-lnk1104.md",
+        "sha256": "aa2b2159d23a66166d3aa6223645d8bdcbc473748c967e99f3d6041413fa02ba"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/tool-errors/linker-tools-error-lnk1107.md",
+        "sha256": "3c342f558fab88cd30a12d94e4f42e093b0b4d49de711164aef3c574c0f5d125"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/tool-errors/linker-tools-error-lnk1112.md",
+        "sha256": "fde435ccb9615e4be7725ba1974f72fd2c8af8bf9a19ab8fb96473f37f733607"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/tool-errors/linker-tools-error-lnk1120.md",
+        "sha256": "193770b2170610951f1c3f093f9b02d731e1f1a3ccb6dc601e0ba9ee42cb557b"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/tool-errors/linker-tools-error-lnk1123.md",
+        "sha256": "78167155b77bdd18e4e5979c1f9de4fa5731645b4af0a14c92ab4b979158166e"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/tool-errors/linker-tools-error-lnk1127.md",
+        "sha256": "e79d9fced04be05bfb7526397a9c1b3c2d6fd2b7e7fd475514b06a6dcee31bc7"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/tool-errors/linker-tools-error-lnk1158.md",
+        "sha256": "18b4228bd0a3ea966a909853ec7c9bc2e330b84bfe86b6120327570d99a05966"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/tool-errors/linker-tools-error-lnk1168.md",
+        "sha256": "fc7991354d665d00134749c56fef60e7f9a53fb0caac642af4baec5b872bedc3"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/tool-errors/linker-tools-error-lnk1181.md",
+        "sha256": "e697064bcccbb02f81d70fce28e39c6cc2b5f3f7cd94fe21189a0ae040173c2f"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/tool-errors/linker-tools-error-lnk1189.md",
+        "sha256": "184040bafaf2919944d61788bda0d51c34b6ef40e6e582769b314f5430cb6589"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/tool-errors/linker-tools-error-lnk2001.md",
+        "sha256": "e6a8dbba47f5d37d204348a5318ad0c4dd35548597b5696ae3d85e68b5275216"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/tool-errors/linker-tools-error-lnk2005.md",
+        "sha256": "e001eeaed902a9a57bbb6d22fb007d64b4374f08f929c30082afacbdb4ef7329"
+      },
+      {
+        "tool": "MSVC",
+        "path": "docs/error-messages/tool-errors/linker-tools-error-lnk2019.md",
+        "sha256": "d7d068e347aadfd00da118177f5815e286c6c91674d474afa84e1ba6022a31a4"
+      }
+    ],
+    "license": "docs/catalog-licenses/C-MSVC.txt"
+  },
+  {
+    "tool": "LLD",
+    "repository": "llvm/llvm-project",
+    "commit": "bd1c9e3efed65cfcc137a183450e56dac3eb9ff4",
+    "definitions": 198,
+    "files": [
+      {
+        "tool": "LLD",
+        "path": "lld/ELF/Driver.cpp",
+        "sha256": "7350bf15ea15a3663dc50ecfa2002ebd4a254c553765c63bc00f2f351c66d5fc"
+      },
+      {
+        "tool": "LLD",
+        "path": "lld/ELF/InputFiles.cpp",
+        "sha256": "c3abee273e6d7ed22dd3741c233e67f9ab345659ddf3a037b0e9ea425e06f67c"
+      },
+      {
+        "tool": "LLD",
+        "path": "lld/ELF/Writer.cpp",
+        "sha256": "0709ff38e41d503bbaaa86a0eb6287621e1e94d7ec42f8b4b61723ce74b33a05"
+      },
+      {
+        "tool": "LLD",
+        "path": "lld/ELF/Relocations.cpp",
+        "sha256": "638c1a7303c70c49f8b227f51a9d3b09ff31d05e2ec3d37620cb4b3b43702058"
+      },
+      {
+        "tool": "LLD",
+        "path": "lld/ELF/Symbols.cpp",
+        "sha256": "c49aafb3c3fa6f279e8192511110eea1765519c204a14545ae441e54c5903ba5"
+      },
+      {
+        "tool": "LLD",
+        "path": "lld/ELF/LinkerScript.cpp",
+        "sha256": "1191e2afc89c6a7d8461ab9cc055ba2871634a6da0db8bb118fdee8ac4aa5488"
+      },
+      {
+        "tool": "LLD",
+        "path": "lld/ELF/SyntheticSections.cpp",
+        "sha256": "551bcb4c7820fcc78d71c04135ff5a6b81738cc4a1e3629b66d46329a51f8f78"
+      }
+    ],
+    "license": "docs/catalog-licenses/C-LLD.txt"
+  }
+]

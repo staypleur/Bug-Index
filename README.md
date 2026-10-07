@@ -7,7 +7,7 @@ C · Python · Java 오류를 VS Code 터미널에서 수집합니다.
 
 - GitHub 로그인과 사용자별 독립된 수집 기록
 - VS Code 셸 통합 기반 자동 수집, 작업 공간별 수집 켜기/끄기
-- 27,990개의 오류 분류 항목(C 54 / Python 9,671 / Java 18,265), 수동 로그 등록, 검색·언어·라이브러리·계열 필터·정렬
+- 29,475개의 오류 분류 항목(C 1,539 / Python 9,671 / Java 18,265), 수동 로그 등록, 검색·언어·라이브러리·계열 필터·정렬
 - NumPy·pandas·SciPy·scikit-learn·SymPy·Django·SQLAlchemy·Flask·requests·FastAPI 소스 기반 메시지 분류와 Spring·Maven·Gradle 예외 분류
 - 도감에 없는 오류의 **미분류 발견** 저장, 해결 메모와 업데이트 후 재분류 (정식 종류 수·XP·랭킹과 별도)
 - 프로젝트·소스 위치·함수 기반 SHA-256 fingerprint와 재발 기록
@@ -63,7 +63,7 @@ Node.js 22 이상과 npm이 필요합니다.
 ```bash
 cd extension
 npx @vscode/vsce package
-code --install-extension bug-index-0.4.0.vsix
+code --install-extension bug-index-0.5.0.vsix
 ```
 
 1. 웹의 **VS Code 연결** 화면에서 수집 토큰을 발급합니다.
@@ -123,12 +123,13 @@ OAuth 테스트는 외부 GitHub 요청을 모의 처리합니다. VS Code 확�
 
 [분류 목록과 확장 방법](docs/catalog.md)을 참고하세요. 기존 21개 통합 분류의 번호는 유지하고,
 Python 내장 예외, Java 표준 예외, C/Java 컴파일 오류와 C sanitizer 진단을 추가했습니다.
-v0.4에는 공식 소스에서 추출한 Python 라이브러리 진단 9,579개와 Java 라이브러리·빌드 도구 예외 10개를 추가했습니다.
-27,990개는 통합 분류와 세부 메시지 유형을 합한 지원 항목 수이며, 전체 가능한 버그 수를 뜻하지 않습니다.
+v0.5에는 공식 소스에서 추출한 Python 라이브러리 진단 9,579개와 Java 라이브러리·빌드 도구 예외 10개를 추가했습니다.
+29,475개는 통합 분류와 세부 메시지 유형을 합한 지원 항목 수이며, 전체 가능한 버그 수를 뜻하지 않습니다.
 Java를 중심으로 OpenJDK·Android·Spring·Spring Boot·Gradle·Maven·Hibernate·Netty·Guava의 공식 소스 메시지를 포함합니다.
 Android는 VS Code 통합 터미널에서 `adb logcat -b crash -d -v threadtime`을 실행하면 명령 종료 후 오류를 수집합니다.
 Gradle 라이브러리 세부 분류에는 `--stacktrace`를 사용합니다. 기기 연결과 USB 디버깅은 별도로 설정해야 합니다.
 소스별 항목 수와 검증 범위는 [오류 분류 문서](docs/catalog.md)를 참고하세요.
+C는 GCC·Clang·MSVC·LLD·Cppcheck·ASan·UBSan으로 확장했습니다. 실행 명령과 검증 범위는 [C 오류 수집](docs/c-collection.md)에 있습니다.
 파일명·변수명·입력값만 달라지는 메시지는 새 종류로 세지 않습니다. 모든 라이브러리 항목에 고정 소스 버전과 발생 위치 링크가 있습니다.
 전체 대표 로그와 일부 실제 실행 오류를 검증했으며 모든 항목을 실제 라이브러리 실행으로 재현한 것은 아닙니다.
 미분류 기록은 원본 마스킹 로그와 해결 메모를 보관합니다. 재분류는 사용자가 요청할 때 수행하고 과거 XP는 지급하지 않습니다.

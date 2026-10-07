@@ -2,7 +2,7 @@
 // Library diagnostics are also covered by the shared traceback detector. Avoid
 // running thousands of library regexes just to decide whether to send a log.
 const RULES = require('./errors.json').filter(entry => !entry.context).map(entry => new RegExp(entry.pattern, 'im'));
-const DETECTORS = require('./diagnostics.json').map(entry => ({ rule: new RegExp(entry.pattern, 'm'), context: entry.context ? new RegExp(entry.context, 'm') : null }));
+const DETECTORS = require('./diagnostics.json').map(entry => ({ rule: new RegExp(entry.pattern, 'm'), context: entry.context ? new RegExp(entry.context, 'm') : null, requiresC: entry.requires_c_context }));
 const PREFIXES = require('./diagnostic-prefixes.json').map(pattern => new RegExp(pattern, 'gm'));
 function mask(text) {
   return text.replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, '')
@@ -14,11 +14,11 @@ function mask(text) {
     .replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, '[EMAIL]')
     .replace(/(?:[A-Z]:[\\/]Users[\\/]|\/Users\/|\/home\/)[^/\\\s"']+/gi, '~/');
 }
-function excerpt(output) {
+function excerpt(output, language) {
   let clean = mask(output.replace(/\r\n/g, '\n'));
   for (const prefix of PREFIXES) clean = clean.replace(prefix, '');
   const matches = RULES.map(rule => clean.match(rule)).filter(Boolean);
-  for (const detector of DETECTORS) if (!detector.context || detector.context.test(clean)) {
+  for (const detector of DETECTORS) if (!detector.context || detector.context.test(clean) || (detector.requiresC && language === 'C')) {
     const match = clean.match(detector.rule);
     if (match) matches.push(match);
   }
@@ -36,4 +36,15 @@ function safeUrl(value) {
   if (url.protocol === 'http:' && !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)) throw new Error('외부 서버 연결에는 HTTPS가 필요합니다.');
   return url.origin;
 }
-module.exports = { mask, excerpt, safeUrl };
+function languageHint(command) {
+  if (typeof command !== 'string') return undefined;
+  const tokens = command.trim().replace(/^&\s*/, '').match(/"[^"]*"|'[^']*'|\S+/g) || [];
+  const unquote = value => value.replace(/^["']|["']$/g, '');
+  const executable = unquote(tokens.shift() || '').split(/[\\/]/).pop().toLowerCase();
+  if (!/^(?:gcc|clang)(?:-\d+)?(?:\.exe)?$|^cl(?:\.exe)?$|^cppcheck(?:\.exe)?$/.test(executable)) return undefined;
+  const args = tokens.map(unquote);
+  if (args.some(arg => /^\/Tp/i.test(arg)) || args.some((arg, i) => arg === '-x' && args[i + 1]?.startsWith('c++'))) return undefined;
+  if (args.some(arg => /\.(?:cpp|cc|cxx)$/i.test(arg))) return undefined;
+  return args.some(arg => /\.c$/i.test(arg) || arg === '--language=c') ? 'C' : undefined;
+}
+module.exports = { mask, excerpt, safeUrl, languageHint };

@@ -1,7 +1,7 @@
 'use strict';
 const vscode = require('vscode');
 const crypto = require('node:crypto');
-const { excerpt, mask, safeUrl } = require('./collector');
+const { excerpt, mask, safeUrl, languageHint } = require('./collector');
 
 function activate(context) {
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -76,9 +76,10 @@ function activate(context) {
       // Start reading immediately; the stream closes once this execution finishes.
       for await (const chunk of event.execution.read()) output = (output + chunk).slice(-65536);
       if (!enabled()) return;
-      const log = excerpt(output);
+      const language = languageHint(event.execution.commandLine?.value);
+      const log = excerpt(output, language);
       if (!log) return;
-      await mutateQueue(queue => { if (queue.length >= 50) { notify('대기 오류 50건이 찼습니다. 서버 연결 후 재시도해주세요.'); return queue; } return [...queue, { log, project: mask(folder.name).slice(0, 120), request_id: crypto.randomUUID() }]; });
+      await mutateQueue(queue => { if (queue.length >= 50) { notify('대기 오류 50건이 찼습니다. 서버 연결 후 재시도해주세요.'); return queue; } return [...queue, { log, ...(language ? { language } : {}), project: mask(folder.name).slice(0, 120), request_id: crypto.randomUUID() }]; });
       await flush();
     } catch { notify('터미널 오류를 읽지 못했습니다. 셸 통합 상태를 확인해주세요.'); }
   }));

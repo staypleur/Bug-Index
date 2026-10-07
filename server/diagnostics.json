@@ -2,5 +2,9 @@
   {"language":"Python", "pattern":"^[ \\t]*(?:[|+]\\s*)?(?:[\\w]+\\.)*[A-Za-z_][\\w]*(?:Error|Exception):[^\\n]*$", "context":"Traceback \\(most recent call last\\):|File \"[^\"\\n]+\\.py\", line \\d+"},
   {"language":"Java", "pattern":"^[ \\t]*(?:(?:Exception in thread \"[^\"\\n]+\"|Caused by:|Suppressed:)\\s+)?(?:[\\w$]+\\.)+[\\w$]*(?:Exception|Error)(?::[^\\n]*)?$", "context":"(?:Exception in thread|Caused by:|Suppressed:)|^[ \\t]*at (?:[^\\s/]+/)?[\\w.$<>]+\\([^\\n]+\\.(?:java|kt)(?::\\d+)?\\)"},
   {"language":"C", "pattern":"^[ \\t]*[^\"'=\\n]+\\.(?:c|h):\\d+(?::\\d+)?:\\s*(?:fatal )?error:[^\\n]+"},
-  {"language":"Java", "pattern":"^[ \\t]*[^\"'=\\n]+\\.java:\\d+:\\s*error:[^\\n]+"}
+  {"language":"Java", "pattern":"^[ \\t]*[^\"'=\\n]+\\.java:\\d+:\\s*error:[^\\n]+"},
+  {"language":"C", "pattern":"^[ \\t]*[^\"'=\\n]+\\.(?:c|h)\\(\\d+(?:,\\d+)?\\)\\s*:\\s*(?:fatal )?error C\\d{4}:[^\\n]+"},
+  {"language":"C", "pattern":"^[ \\t]*[^\"'=\\n]+\\.(?:c|h):\\d+(?::\\d+)?:\\s*runtime error:[^\\n]+"},
+  {"language":"C", "pattern":"^.*ERROR: AddressSanitizer:[^\\n]+"},
+  {"language":"C", "pattern":"^[ \\t]*(?:(?:[^\\n:]*[/\\\\])?ld(?:\\.lld)?(?:\\.exe)?|lld-link(?:\\.exe)?):\\s*(?:fatal )?error:[^\\n]+|^.*?\\s:\\s*(?:fatal )?error LNK\\d{4}:[^\\n]+", "context":"\\.c(?:[:(\\s]|$)", "requires_c_context":true}
 ]

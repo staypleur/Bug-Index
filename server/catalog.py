@@ -9,11 +9,14 @@ CATALOG = json.loads(Path(__file__).with_name('errors.json').read_text(encoding=
 BY_ID = {entry['id']: entry for entry in CATALOG}
 RULES = [(entry, re.compile(entry['pattern'], re.I | re.M)) for entry in CATALOG]
 CORE_RULES = [(entry, pattern) for entry, pattern in RULES if not entry.get('context')]
+C_RULES = [entry for entry in CATALOG if entry.get('c_kind')]
+from server.c_diagnostics import index as c_index
+C_INDEX = c_index(C_RULES)
 LIBRARY_RULES = {}
 for entry, pattern in RULES:
-    if entry.get('context'):
+    if entry.get('context') and not entry.get('c_kind'):
         LIBRARY_RULES.setdefault((entry['context'], entry['exception']), []).append((entry, pattern))
-CONTEXTS = {entry['context']: re.compile(entry['context'], re.M) for entry in CATALOG if entry.get('context')}
+CONTEXTS = {entry['context']: re.compile(entry['context'], re.M) for entry in CATALOG if entry.get('context') and not entry.get('c_kind')}
 PREFIXES = [re.compile(pattern, re.M) for pattern in json.loads(Path(__file__).with_name('diagnostic-prefixes.json').read_text(encoding='utf-8'))]
 JAVA_TRACE = re.compile(r'^[ \t]*(?:(?:Exception in thread "[^"\n]+"|Caused by:|Suppressed:)\s+)?((?:[\w$]+\.)+[\w$]*(?:Exception|Error))(?::[ \t]*([^\n]*))?$', re.M)
 JAVA_FRAMES = re.compile(r'^[ \t]*at (?:[^\s/]+/)?([\w.$<>]+)\([^\n]+\)', re.M)
@@ -30,7 +33,7 @@ def diagnostic(raw, language=None):
     for entry, pattern, context in DETECTORS:
         if language and language != entry['language']:
             continue
-        if context and not context.search(clean):
+        if context and not context.search(clean) and not (entry.get('requires_c_context') and language == 'C'):
             continue
         for match in pattern.finditer(clean):
             name = match.group().split(':', 1)[0].rsplit('.', 1)[-1].strip()
@@ -87,6 +90,9 @@ def normalize(raw):
 def classify(raw, language=None):
     clean = normalize(raw)
     found = []
+    if C_RULES:
+        from server.c_diagnostics import candidates as c_candidates
+        found.extend(c_candidates(clean, language, C_INDEX, template_matches))
     contexts = {context for context, pattern in CONTEXTS.items() if pattern.search(clean)}
     exception_names = set(re.findall(r'^[ \t]*(?:[|+]\s*)?(\w+):', clean, re.M))
     candidates = CORE_RULES

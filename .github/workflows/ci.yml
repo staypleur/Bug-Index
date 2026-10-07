@@ -15,10 +15,15 @@ jobs:
       - run: pip install -r requirements.lock -r requirements-dev.txt
       - name: Install libraries for actual traceback checks
         run: pip install numpy==2.2.6 pandas==2.3.3
+      - name: Install C diagnostic tools
+        run: sudo apt-get update && sudo apt-get install -y clang lld cppcheck
       - run: python -m scripts.build_catalog --check
       - name: Require C and Java compilers for runtime diagnostics
         run: |
           gcc --version
+          clang --version
+          ld.lld --version
+          cppcheck --version
           javac -version
       - run: python -m pytest -q
       - uses: actions/setup-node@v4
@@ -27,3 +32,18 @@ jobs:
       - run: node --test extension/*.test.js
       - run: node --check extension/extension.js && node --check web/app.js
       - run: docker build -t bug-index:ci .
+  msvc-c:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.lock -r requirements-dev.txt
+      - name: Run actual MSVC C-mode diagnostics
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          if errorlevel 1 exit /b 1
+          where cl || exit /b 1
+          python -m pytest tests/test_c_tools.py -q -k actual_msvc

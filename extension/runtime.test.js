@@ -27,7 +27,7 @@ function setup() {
   try { delete require.cache[require.resolve('./extension')]; require('./extension').activate(context); } finally { Module._load = original; }
   return {
     run: name => commands.get(`bugIndex.${name}`)(),
-    emit: text => terminalListener({ execution: { cwd: uri, async *read() { yield text; } } }),
+    emit: (text, command) => terminalListener({ execution: { cwd: uri, commandLine: { value: command }, async *read() { yield text; } } }),
     queue: () => JSON.parse(secrets.get('pending') || '[]'),
     dispose: () => disposables.forEach(d => d.dispose()),
   };
@@ -41,6 +41,19 @@ test('automatic capture masks data before sending', async () => {
   const runtime = setup(), original = global.fetch; const requests = [];
   global.fetch = async (url, options) => { requests.push(JSON.parse(options.body)); return { ok: true, json: async () => ({ collected: true, species: 'TypeError', xp_earned: 1 }) }; };
   try { await runtime.run('enable'); await runtime.emit('Traceback (most recent call last):\n File "/Users/alice/main.py", line 2, in run\nTypeError: PASSWORD=verysecret'); assert.equal(requests.length, 1); assert.ok(!requests[0].log.includes('verysecret')); assert.ok(!requests[0].log.includes('alice')); assert.equal(runtime.queue().length, 0); } finally { global.fetch = original; runtime.dispose(); }
+});
+
+test('C builds send a language hint for linker failures without transmitting command arguments', async () => {
+  const runtime = setup(), original = global.fetch, requests = [];
+  global.fetch = async (url, options) => { requests.push(JSON.parse(options.body)); return { ok: true, json: async () => ({ collected: true }) }; };
+  try {
+    await runtime.run('enable');
+    await runtime.emit('ld.lld: error: cannot open input file missing.o', 'clang main.c -DAPI_KEY=private_command_value');
+    assert.equal(requests.length, 1);
+    assert.equal(requests[0].language, 'C');
+    assert.ok(!JSON.stringify(requests[0]).includes('private_command_value'));
+    assert.equal(runtime.queue().length, 0);
+  } finally { global.fetch = original; runtime.dispose(); }
 });
 
 test('offline captures retain the same id on retry', async () => {
