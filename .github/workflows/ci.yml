@@ -14,6 +14,10 @@ jobs:
           python-version: '3.12'
       - run: pip install -r requirements.lock pytest==9.0.2
       - run: python -m scripts.build_catalog --check
+      - name: Require C and Java compilers for runtime diagnostics
+        run: |
+          gcc --version
+          javac -version
       - run: python -m pytest -q
       - uses: actions/setup-node@v4
         with:

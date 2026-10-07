@@ -20,7 +20,7 @@ async function refresh() {
   $('#mastered').textContent = new Set(state.bugs.filter(b => b.mastered).map(b => b.family_id)).size;
   $('#collection-count').textContent = `${discovered.length} / ${state.bugs.length}`;
   $('#nav-count').textContent = discovered.length;
-  $('#total-caption').textContent = discovered.length ? `${state.bugs.length}종 중 ${Math.round(discovered.length / state.bugs.length * 100)}% 발견` : '도감의 첫 페이지를 채워보세요';
+  $('#total-caption').textContent = discovered.length ? `${state.bugs.length}종 중 ${(discovered.length / state.bugs.length * 100).toFixed(1)}% 발견` : '도감의 첫 페이지를 채워보세요';
   renderCards();
 }
 function renderCards() {
