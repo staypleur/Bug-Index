@@ -7,7 +7,9 @@ C · Python · Java 오류를 VS Code 터미널에서 수집합니다.
 
 - GitHub 로그인과 사용자별 독립된 수집 기록
 - VS Code 셸 통합 기반 자동 수집, 작업 공간별 수집 켜기/끄기
-- 225개의 오류 분류 항목(C 54 / Python 87 / Java 84), 수동 로그 등록, 검색·언어·계열 필터·정렬
+- 9,819개의 오류 분류 항목(C 54 / Python 9,671 / Java 94), 수동 로그 등록, 검색·언어·라이브러리·계열 필터·정렬
+- NumPy·pandas·SciPy·scikit-learn·SymPy·Django·SQLAlchemy·Flask·requests·FastAPI 소스 기반 메시지 분류와 Spring·Maven·Gradle 예외 분류
+- 도감에 없는 오류의 **미분류 발견** 저장, 해결 메모와 업데이트 후 재분류 (정식 종류 수·XP·랭킹과 별도)
 - 프로젝트·소스 위치·함수 기반 SHA-256 fingerprint와 재발 기록
 - 세부종류별 수집과 오류 계열별 공유 경험치·레벨, 개별 버그별 원인·해결 방법·학습 메모
 - 마스터 조건: 해당 오류 종류 조우 5회 이상 + 서로 다른 버그 3건 해결
@@ -61,7 +63,7 @@ Node.js 22 이상과 npm이 필요합니다.
 ```bash
 cd extension
 npx @vscode/vsce package
-code --install-extension bug-index-0.2.0.vsix
+code --install-extension bug-index-0.3.0.vsix
 ```
 
 1. 웹의 **VS Code 연결** 화면에서 수집 토큰을 발급합니다.
@@ -77,7 +79,8 @@ code --install-extension bug-index-0.2.0.vsix
 
 - VS Code 1.93 이상과 [터미널 셸 통합](https://code.visualstudio.com/docs/terminal/shell-integration)이 필요합니다.
 - 현재 터미널에서 시작한 명령의 출력을 감지합니다. Debug Console, Output 패널, Visual Studio는 아직 지원하지 않습니다.
-- 미리 정의한 영어 진단 패턴만 분류합니다. 정상 로그에 실제 진단 형식의 문자열을 출력하는 경우도 감지될 수 있습니다.
+- 알려진 영어 진단을 분류하고, traceback/stack trace 등 오류 증거가 있는 미지원 진단은 미분류 기록으로 보관합니다. 정상 로그에 실제 진단 형식의 문자열을 출력하는 경우도 감지될 수 있습니다.
+- Python 라이브러리 세부 분류에는 해당 라이브러리의 traceback 경로가 필요합니다. 마지막 예외 한 줄만 붙여 넣으면 기본 계열로 분류될 수 있습니다.
 - C의 메모리 누수·버퍼 오버플로는 AddressSanitizer/LeakSanitizer 진단 출력이 있어야 수집됩니다.
 - 한 실행의 오류 문맥을 한 건으로 수집합니다. 복수 오류를 완전히 분리하는 파서는 후속 작업입니다.
 - 서버 연결 실패 시 최대 50건을 VS Code SecretStorage에 보관하고 30초마다 재시도합니다.
@@ -120,8 +123,11 @@ OAuth 테스트는 외부 GitHub 요청을 모의 처리합니다. VS Code 확�
 
 [분류 목록과 확장 방법](docs/catalog.md)을 참고하세요. 기존 21개 통합 분류의 번호는 유지하고,
 Python 내장 예외, Java 표준 예외, C/Java 컴파일 오류와 C sanitizer 진단을 추가했습니다.
-NumPy, pandas, Spring 등 외부 라이브러리는 이번 확장에 포함하지 않았습니다.
-225개는 통합 분류와 세부종류를 합한 지원 항목 수이며, 전체 가능한 버그 수를 뜻하지 않습니다.
+v0.3에는 공식 소스에서 추출한 Python 라이브러리 진단 9,579개와 Java 라이브러리·빌드 도구 예외 10개를 추가했습니다.
+9,819개는 통합 분류와 세부 메시지 유형을 합한 지원 항목 수이며, 전체 가능한 버그 수를 뜻하지 않습니다.
+파일명·변수명·입력값만 달라지는 메시지는 새 종류로 세지 않습니다. 모든 라이브러리 항목에 고정 소스 버전과 발생 위치 링크가 있습니다.
+전체 대표 로그와 일부 실제 실행 오류를 검증했으며 모든 항목을 실제 라이브러리 실행으로 재현한 것은 아닙니다.
+미분류 기록은 원본 마스킹 로그와 해결 메모를 보관합니다. 재분류는 사용자가 요청할 때 수행하고 과거 XP는 지급하지 않습니다.
 
 ## 남은 출시 결정
 

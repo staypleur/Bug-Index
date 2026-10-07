@@ -1,6 +1,8 @@
 # Bug Index for VS Code
 
 C, Python, Java 터미널 오류를 개인 Bug Index 도감에 기록합니다.
+v0.3은 9,819개 도감 항목과 traceback/stack trace 기반 미분류 발견을 지원합니다.
+Python 라이브러리의 세부 분류에는 오류 한 줄뿐 아니라 라이브러리 경로가 포함된 traceback이 필요합니다.
 
 ## 시작
 
@@ -21,3 +23,4 @@ VS Code 1.93 이상과 터미널 셸 통합이 필요합니다. Debug Console은
 **Clear Pending Captures**는 대기 로그를 삭제하고, **Disconnect**는 대기 로그와 연결 정보를 삭제합니다.
 
 지원 패턴과 운영 방법은 [프로젝트 README](https://github.com/staypleur/Bug-Index)를 참고하세요.
+라이브러리 진단의 출처와 라이선스 고지는 함께 포함된 `THIRD_PARTY_NOTICES.txt`에 있습니다.

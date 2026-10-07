@@ -54,6 +54,21 @@ def initialize():
         );
         CREATE INDEX IF NOT EXISTS bugs_owner ON bugs(user_id, species);
         CREATE INDEX IF NOT EXISTS occurrences_bug ON occurrences(bug_id, occurred_at);
+        CREATE TABLE IF NOT EXISTS unknown_bugs (
+          id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id),
+          fingerprint TEXT NOT NULL, project TEXT NOT NULL, language TEXT NOT NULL,
+          diagnostic TEXT NOT NULL, first_seen REAL NOT NULL, last_seen REAL NOT NULL,
+          cause TEXT NOT NULL DEFAULT '', solution TEXT NOT NULL DEFAULT '',
+          memo TEXT NOT NULL DEFAULT '', solved_at REAL,
+          resolved_bug_id INTEGER REFERENCES bugs(id), UNIQUE(user_id,fingerprint)
+        );
+        CREATE TABLE IF NOT EXISTS unknown_occurrences (
+          id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id),
+          unknown_id INTEGER NOT NULL REFERENCES unknown_bugs(id), request_id TEXT NOT NULL,
+          log TEXT NOT NULL, occurred_at REAL NOT NULL, UNIQUE(user_id,request_id)
+        );
+        CREATE INDEX IF NOT EXISTS unknown_owner ON unknown_bugs(user_id,last_seen);
+        CREATE INDEX IF NOT EXISTS unknown_occurrence_bug ON unknown_occurrences(unknown_id,occurred_at);
         ''')
         columns = {row['name'] for row in db.execute('PRAGMA table_info(bugs)')}
         if 'family_id' not in columns:

@@ -30,7 +30,9 @@ function activate(context) {
         if (!response.ok) { if ([401, 403].includes(response.status)) { await context.workspaceState.update('enabled', false); update(); notify('수집 토큰을 확인하고 다시 연결해주세요.'); } break; }
         const result = await response.json();
         await mutateQueue(queue => queue.filter(item => item.request_id !== entry.request_id));
-        if (result.collected && !result.duplicate) vscode.window.showInformationMessage(`🐛 ${result.new_case ? '새로운 버그 발견!' : '버그 재등장!'} ${result.species} · +${result.xp_earned} XP`);
+        if (result.collected && !result.duplicate) vscode.window.showInformationMessage(result.unclassified
+          ? '🔎 미분류 오류를 발견했습니다. Bug Index의 미분류 발견에서 확인하세요.'
+          : `🐛 ${result.new_case ? '새로운 버그 발견!' : '버그 재등장!'} ${result.species} · +${result.xp_earned} XP`);
       }
     } catch { status.tooltip = '서버 연결을 기다리는 중입니다. 마스킹된 오류를 보관하고 재시도합니다.'; }
     finally { flushing = false; }

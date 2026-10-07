@@ -230,5 +230,100 @@ def test_unknown_messages_remain_generic_and_keep_catalog_ids(client):
     entries = client.get('/api/collection').json()
     generic = next(e for e in entries if e['id'] == 9)
     assert generic['name'] == 'TypeError' and generic['discovered']
-    assert len(entries) == 225
+    assert len(entries) >= 5000
     assert {e['id'] for e in entries} >= set(range(1, 22))
+
+
+UNKNOWN = 'Traceback (most recent call last):\n  File "main.py", line 7, in run\nCustomProjectError: rejected request PASSWORD=secret123'
+
+
+def test_unknown_collection_is_private_masked_idempotent_and_separate(client):
+    first = capture(client, log=UNKNOWN, request_id='unknown-001').json()
+    assert first['collected'] and first['unclassified'] and first['xp_earned'] == 0
+    assert capture(client, log=UNKNOWN, request_id='unknown-001').json()['duplicate']
+    capture(client, log=UNKNOWN)
+    summary = client.get('/api/unknown').json()
+    assert summary['total'] == 1 and summary['items'][0]['encounters'] == 2
+    detail = client.get(f'/api/unknown/{first["unknown_id"]}').json()
+    assert all('secret123' not in row['log'] for row in detail['occurrences'])
+    assert not any(row['discovered'] for row in client.get('/api/collection').json())
+    other = token_for_second_user()
+    assert client.get('/api/unknown', headers=other).json()['total'] == 0
+    assert client.get(f'/api/unknown/{first["unknown_id"]}', headers=other).status_code == 404
+    assert client.patch(f'/api/unknown/{first["unknown_id"]}', json={}, headers=other).status_code == 404
+    assert client.post(f'/api/unknown/{first["unknown_id"]}/reclassify', json={}, headers=other).status_code == 403
+    exported = client.get('/api/export').json()
+    assert exported['version'] == 2 and len(exported['unknown_bugs']) == 1
+    assert len(exported['unknown_occurrences']) == 2 and exported['bugs'] == []
+
+
+def test_unknown_notes_and_no_ranking_points(client):
+    uid = capture(client, log=UNKNOWN).json()['unknown_id']
+    assert client.patch(f'/api/unknown/{uid}', json={'solved': True}).status_code == 400
+    assert client.patch(f'/api/unknown/{uid}', json={'cause': 'custom error', 'solution': 'validate input', 'memo': 'API_KEY=secret123', 'solved': True}).status_code == 200
+    detail = client.get(f'/api/unknown/{uid}').json()
+    assert detail['solved_at'] and 'secret123' not in detail['memo']
+    assert not client.post(f'/api/unknown/{uid}/reclassify', json={}).json()['classified']
+    with connect() as db: db.execute('UPDATE users SET pro=1,ranking_opt_in=1')
+    assert client.get('/api/ranking').json()[0]['score'] == 0
+
+
+def test_unknown_reclassification_preserves_notes_dates_logs_and_does_not_grant_xp(client, monkeypatch):
+    uid = capture(client, log=UNKNOWN, request_id='upgrade-001').json()['unknown_id']
+    capture(client, log=UNKNOWN, request_id='upgrade-002')
+    client.patch(f'/api/unknown/{uid}', json={'cause': 'x', 'solution': 'y', 'memo': 'keep', 'solved': True})
+    original = client.get(f'/api/unknown/{uid}').json()
+    def new_rule(log, language=None):
+        result = classify('TypeError: bad input')
+        result['log'] = mask(log)
+        return result
+    monkeypatch.setattr('server.app.classify', new_rule)
+    result = client.post(f'/api/unknown/{uid}/reclassify', json={}).json()
+    assert result['classified']
+    assert client.post(f'/api/unknown/{uid}/reclassify', json={}).json()['duplicate']
+    assert client.get('/api/unknown').json()['total'] == 0
+    case = client.get('/api/species/9/cases').json()[0]
+    assert (case['cause'], case['solution'], case['memo']) == ('x', 'y', 'keep')
+    assert case['first_seen'] == original['first_seen'] and case['last_seen'] == original['last_seen']
+    assert len(case['occurrences']) == 2 and all(row['xp'] == 0 for row in case['occurrences'])
+    assert capture(client, log=UNKNOWN, request_id='upgrade-001').json()['duplicate']
+
+
+def test_unknown_and_known_share_capture_rate_limit(client):
+    for n in range(30):
+        assert capture(client, log=UNKNOWN, request_id=f'unknown-{n:03}').status_code == 200
+        assert capture(client, request_id=f'known-{n:03}').status_code == 200
+    assert capture(client, log=UNKNOWN, request_id='overflow-001').status_code == 429
+
+
+def test_unknown_pagination_and_plain_output(client):
+    assert not capture(client, log='Build succeeded. 0 errors.').json()['collected']
+    for n in range(55):
+        capture(client, log=UNKNOWN, project=f'project-{n}')
+    page = client.get('/api/unknown').json()
+    assert page['total'] == 55 and len(page['items']) == 50 and page['has_more']
+    last = client.get('/api/unknown?offset=50').json()
+    assert len(last['items']) == 5 and not last['has_more']
+    assert not {row['id'] for row in page['items']} & {row['id'] for row in last['items']}
+
+
+def test_large_collection_is_compressed(client):
+    response = client.get('/api/collection', headers={'Accept-Encoding': 'gzip'})
+    assert response.headers['content-encoding'] == 'gzip'
+    assert len(response.json()) >= 5000
+
+
+def test_reclassify_merges_existing_notes_and_keeps_other_users_private(client, monkeypatch):
+    known = capture(client).json()['bug_id']
+    client.patch(f'/api/cases/{known}', json={'cause': 'old cause', 'solution': 'old solution', 'memo': 'old memo', 'solved': True})
+    unknown = capture(client, log=UNKNOWN).json()['unknown_id']
+    client.patch(f'/api/unknown/{unknown}', json={'cause': 'new cause', 'solution': 'new solution', 'memo': 'new memo', 'solved': True})
+    def upgraded(log, language=None):
+        return classify('Traceback (most recent call last):\n  File "main.py", line 7, in run\nTypeError: bad input')
+    monkeypatch.setattr('server.app.classify', upgraded)
+    result = client.post(f'/api/unknown/{unknown}/reclassify', json={}).json()
+    assert result['bug_id'] == known
+    case = client.get('/api/species/9/cases').json()[0]
+    for field in ('cause', 'solution', 'memo'):
+        assert f'old {field}' in case[field] and f'new {field}' in case[field]
+    assert len(case['occurrences']) == 2 and sum(row['xp'] for row in case['occurrences']) == 1

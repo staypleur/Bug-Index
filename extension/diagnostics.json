@@ -1,0 +1,6 @@
+[
+  {"language":"Python", "pattern":"^[ \\t]*(?:[|+]\\s*)?(?:[\\w]+\\.)*[A-Za-z_][\\w]*(?:Error|Exception):[^\\n]*$", "context":"Traceback \\(most recent call last\\):|File \"[^\"\\n]+\\.py\", line \\d+"},
+  {"language":"Java", "pattern":"^[ \\t]*(?:(?:Exception in thread \"[^\"\\n]+\"|Caused by:|Suppressed:)\\s+)?(?:[\\w$]+\\.)+[A-Za-z_$][\\w$]*(?:Exception|Error)(?::[^\\n]*)?$", "context":"(?:Exception in thread|Caused by:|Suppressed:)|^[ \\t]*at [\\w.$]+\\([^\\n]+\\.java(?::\\d+)?\\)"},
+  {"language":"C", "pattern":"^[ \\t]*[^\"'=\\n]+\\.(?:c|h):\\d+(?::\\d+)?:\\s*(?:fatal )?error:[^\\n]+"},
+  {"language":"Java", "pattern":"^[ \\t]*[^\"'=\\n]+\\.java:\\d+:\\s*error:[^\\n]+"}
+]

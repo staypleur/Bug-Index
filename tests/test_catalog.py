@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from server.catalog import CATALOG, classify
+from server.catalog import CATALOG, classify, diagnostic, template_matches
 from server.db import connect, initialize
 
 
@@ -36,6 +36,40 @@ def test_final_chained_exception_and_windows_line_endings():
     log = 'TypeError: unsupported operand type(s) for +: int and str\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File "main.py", line 2, in run\r\nValueError: invalid literal for int() with base 10: abc\r\n'
     assert classify(log)['name'] == 'ValueError.InvalidInteger'
     assert classify('Exception in thread "main" java.lang.StackOverflowError\r\n')['id'] == 5
+
+
+def test_final_unknown_cause_is_not_replaced_with_an_earlier_known_exception():
+    log = 'Traceback (most recent call last):\n  File "main.py", line 1, in run\nValueError: bad input\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File "main.py", line 3, in run\nCustomProjectError: final failure'
+    assert classify(log) is None
+    assert diagnostic(log)['diagnostic'] == 'CustomProjectError: final failure'
+
+
+def test_source_templates_require_library_context_and_keep_dynamic_values_out_of_species():
+    entry = next(e for e in CATALOG if e.get('message_template') and '\x00' in e['message_template'])
+    sample = entry['sample'].replace('sample_value', 'another_value')
+    assert classify(sample)['id'] == entry['id']
+    windows = sample.replace('/venv/site-packages/', 'C:\\venv\\Lib\\site-packages\\').replace(f'{entry["package"]}/', f'{entry["package"]}\\')
+    # Module names can differ from display package names (sklearn/scikit-learn).
+    assert classify(windows)['id'] == entry['id']
+    bare = sample.split('\n')[-1]
+    assert classify(bare)['id'] == entry['family_id']
+
+
+def test_template_matching_handles_large_values_without_regex_backtracking():
+    assert template_matches('Expected \x00 columns, got \x00', 'Expected 12 columns, got 8')
+    assert not template_matches('Expected \x00 columns, got \x00', 'Expected 12 rows, got 8')
+    assert template_matches('prefix \x00 x \x00 x \x00 suffix', 'prefix ' + 'x ' * 16000 + 'suffix')
+
+
+def test_catalog_size_provenance_and_unique_stable_ids():
+    assert len(CATALOG) >= 5000
+    assert len({e['id'] for e in CATALOG}) == len(CATALOG)
+    keys = [e['template_key'] for e in CATALOG if e.get('template_key')]
+    assert len(set(keys)) == len(keys)
+    for entry in CATALOG:
+        if entry.get('verification') == 'source-template':
+            assert '/blob/' in entry['source'] and '#L' in entry['source']
+            assert len(entry['source'].split('/blob/')[1].split('/')[0]) == 40
 
 
 def test_legacy_database_keeps_existing_records(tmp_path, monkeypatch):

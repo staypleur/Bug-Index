@@ -300,11 +300,56 @@ def catalog():
             ub_location + r'[^\n]*(?:' + pattern + ')',
             'main.c:2:1: runtime error: ' + message, label=label, priority=100, source=UBSAN_SOURCE)
 
+    # A reviewed extraction pipeline supplies source-backed library templates.
+    # Fixed IDs live in the committed snapshot; downloading never happens at runtime.
+    library_path = ROOT / 'server/library_templates.json'
+    java_libraries = [
+        (300, 'Spring', 'org.springframework.beans.factory.BeanCreationException', '빈 생성 실패', 'https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/beans/factory/BeanCreationException.html'),
+        (301, 'Spring', 'org.springframework.beans.factory.BeanCreationNotAllowedException', '현재 단계에서 빈 생성 불가', 'https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/beans/factory/BeanCreationNotAllowedException.html'),
+        (302, 'Spring', 'org.springframework.beans.factory.BeanCurrentlyInCreationException', '생성 중인 빈의 순환 의존', 'https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/beans/factory/BeanCurrentlyInCreationException.html'),
+        (303, 'Spring', 'org.springframework.beans.factory.BeanIsAbstractException', '추상 빈 인스턴스 생성 실패', 'https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/beans/factory/BeanIsAbstractException.html'),
+        (304, 'Spring', 'org.springframework.beans.factory.support.ScopeNotActiveException', '활성화되지 않은 빈 범위', 'https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/beans/factory/support/ScopeNotActiveException.html'),
+        (305, 'Spring', 'org.springframework.beans.factory.UnsatisfiedDependencyException', '빈 의존성 주입 실패', 'https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/beans/factory/UnsatisfiedDependencyException.html'),
+        (306, 'Spring', 'org.springframework.dao.DataIntegrityViolationException', '데이터 무결성 제약 위반', 'https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/dao/DataIntegrityViolationException.html'),
+        (307, 'Spring', 'org.springframework.dao.DuplicateKeyException', '데이터 키 중복', 'https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/dao/DuplicateKeyException.html'),
+        (308, 'Maven', 'org.apache.maven.plugin.MojoExecutionException', 'Maven 플러그인 실행 오류', 'https://maven.apache.org/ref/3.9.11/maven-plugin-api/apidocs/org/apache/maven/plugin/MojoExecutionException.html'),
+        (309, 'Gradle', 'org.gradle.api.GradleException', 'Gradle 빌드 오류', 'https://docs.gradle.org/current/javadoc/org/gradle/api/GradleException.html'),
+    ]
+    for number, package, name, label, source in java_libraries:
+        pattern = r'^[ \t]*(?:(?:Exception in thread "[^"\n]+"|Caused by:|Suppressed:)\s+)?' + re.escape(name) + r'(?::|$)'
+        add(number, name, 'Java', 'Build' if package in ('Maven', 'Gradle') else 'Library', 'Uncommon', '🦋', pattern,
+            f'Caused by: {name}: example diagnostic', label=label, priority=100, source=source)
+        entries[-1].update(package=package, verification='documented-exception')
+    if library_path.exists():
+        roots = {e['name']: e for e in entries if e['family_id'] == e['id'] and e['language'] == 'Python'}
+        for number, exception in ((500, 'Exception'), (501, 'FloatingPointError'), (502, 'LookupError'), (503, 'ReferenceError'), (504, 'UnicodeError')):
+            add(number, exception, 'Python', 'Runtime', 'Common', '🐞', py(exception), f'{exception}: unspecified')
+        roots = {e['name']: e for e in entries if e['family_id'] == e['id'] and e['language'] == 'Python'}
+        for item in json.loads(library_path.read_text(encoding='utf-8')):
+            if item.get('retired'):
+                continue
+            exception, message, number = item['exception'], item['template'], item['id']
+            chunks = message.split('\u0000')
+            # Escape whitespace separately: re.escape(' ') produces a backslash-space.
+            pattern = r'[^\n]*?'.join(''.join(r'\s+' if part.isspace() else re.escape(part)
+                                             for part in re.split(r'(\s+)', chunk)) for chunk in chunks)
+            context = r'File "[^"\n]*(?:/|\\)' + re.escape(item['module']) + r'(?:/|\\)[^"\n]*", line \d+'
+            sample_message = message.replace('\u0000', 'sample_value')
+            sample = f'Traceback (most recent call last):\n  File "/venv/site-packages/{item["module"]}/example.py", line 12, in run\n{exception}: {sample_message}'
+            parent = roots.get(exception)
+            add(number, f'{item["package"]}.{exception}.{item["key"][:12]}', 'Python', 'Library', 'Uncommon', '🦋',
+                py(exception) + r'[ \t]*' + pattern + r'[ \t]*$', sample,
+                family=parent['id'] if parent else None,
+                label=message.replace('\u0000', '…'), priority=200 + min(len(''.join(chunks)), 500), source=item['source'])
+            entries[-1].update(package=item['package'], context=context, exception=exception,
+                               verification='source-template', template_key=item['key'], message_template=message)
+
     assert len({e['id'] for e in entries}) == len(entries)
     assert len({(e['language'], e['name']) for e in entries}) == len(entries)
+    numbers = {e['id'] for e in entries}
     for entry in entries:
         re.compile(entry['pattern'], re.I | re.M)
-        assert entry['family_id'] in {e['id'] for e in entries}
+        assert entry['family_id'] in numbers
     return sorted(entries, key=lambda e: e['id'])
 
 
@@ -312,15 +357,30 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--check', action='store_true')
     args = parser.parse_args()
-    data = json.dumps(catalog(), ensure_ascii=False, indent=2) + '\n'
+    entries = catalog()
+    data = json.dumps(entries, ensure_ascii=False, indent=2) + '\n'
     for path in (ROOT / 'server/errors.json', ROOT / 'extension/errors.json'):
         if args.check:
             if not path.exists() or path.read_text(encoding='utf-8') != data:
                 parser.error(f'Catalog is out of sync: {path}')
         else:
             path.write_text(data, encoding='utf-8')
-    counts = {lang: sum(e['language'] == lang for e in catalog()) for lang in ('C', 'Python', 'Java')}
-    print(f'{len(catalog())} diagnostic entries: {counts}')
+    detectors = (ROOT / 'server/diagnostics.json').read_text(encoding='utf-8')
+    detector_path = ROOT / 'extension/diagnostics.json'
+    if args.check:
+        if not detector_path.exists() or detector_path.read_text(encoding='utf-8') != detectors:
+            parser.error('Shared diagnostic detectors are out of sync')
+    else:
+        detector_path.write_text(detectors, encoding='utf-8')
+    notices = '\n\n'.join(path.read_text(encoding='utf-8') for path in sorted((ROOT / 'docs/catalog-licenses').glob('*.txt')))
+    notice_path = ROOT / 'extension/THIRD_PARTY_NOTICES.txt'
+    if args.check:
+        if not notice_path.exists() or notice_path.read_text(encoding='utf-8') != notices:
+            parser.error('Third-party notices are out of sync')
+    else:
+        notice_path.write_text(notices, encoding='utf-8')
+    counts = {lang: sum(e['language'] == lang for e in entries) for lang in ('C', 'Python', 'Java')}
+    print(f'{len(entries)} diagnostic entries: {counts}')
 
 
 if __name__ == '__main__':

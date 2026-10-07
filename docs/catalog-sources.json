@@ -1,0 +1,82 @@
+[
+  {
+    "package": "numpy",
+    "repository": "numpy/numpy",
+    "commit": "286e698f1dcf601648b165f48485ceaeec9c6231",
+    "archive_sha256": "45974e6fd1796e4e97e594b55fca2594d2be75255e2165954e5dc3cd44392084",
+    "license": "docs/catalog-licenses/numpy.txt",
+    "templates": 506
+  },
+  {
+    "package": "pandas",
+    "repository": "pandas-dev/pandas",
+    "commit": "63651d6717faa0fb850c2723c0183194255d6e1c",
+    "archive_sha256": "49a1cc0fa3e09baf064ed8d8b7eed9a11997f5a3a87c2f34c5a670b4dde22930",
+    "license": "docs/catalog-licenses/pandas.txt",
+    "templates": 1753
+  },
+  {
+    "package": "scipy",
+    "repository": "scipy/scipy",
+    "commit": "0aa66630fc0717788fd39b25bdaecfcc8d7002cd",
+    "archive_sha256": "9f4c56f9d434c639a80afdb13f33344ba42c65cccd5ee4e9cfcd5715f2e68deb",
+    "license": "docs/catalog-licenses/scipy.txt",
+    "templates": 2769
+  },
+  {
+    "package": "scikit-learn",
+    "repository": "scikit-learn/scikit-learn",
+    "commit": "c95f032d2960b69ed20c1b15f7be5a8aa10595f8",
+    "archive_sha256": "ca7b6520f301fb7302c49a55b470477e3ea6e68eb7719879799aa92f96113118",
+    "license": "docs/catalog-licenses/scikit-learn.txt",
+    "templates": 1176
+  },
+  {
+    "package": "sympy",
+    "repository": "sympy/sympy",
+    "commit": "319ea7a6186edf88bc23d502917242b10314ae51",
+    "archive_sha256": "e4bf4a0c0ae056dbcf0f6d91eb22abc4ae66eb0f84f452e0023c249335548175",
+    "license": "docs/catalog-licenses/sympy.txt",
+    "templates": 2294
+  },
+  {
+    "package": "Django",
+    "repository": "django/django",
+    "commit": "135d7c606fc66a9f47f690e5f242ced386524954",
+    "archive_sha256": "1ff9044325f6ee92708d47c20cf61d7d7dd86a6db06cd1bf31cb47645c7410fc",
+    "license": "docs/catalog-licenses/Django.txt",
+    "templates": 829
+  },
+  {
+    "package": "SQLAlchemy",
+    "repository": "sqlalchemy/sqlalchemy",
+    "commit": "ebfa7096f324df197f19cd2c125feaf4e4cc0537",
+    "archive_sha256": "6f5536b25bf7757c05254fd94e36c9e56973b478d59a36196bcaefce73eeaf12",
+    "license": "docs/catalog-licenses/SQLAlchemy.txt",
+    "templates": 184
+  },
+  {
+    "package": "Flask",
+    "repository": "pallets/flask",
+    "commit": "d73fa1cdcbd8b1465c151db8924ba58b1dd14e35",
+    "archive_sha256": "f2859ca2addf5a0c09e66f79a97851c26ea534727970596fd9e1f643e469a827",
+    "license": "docs/catalog-licenses/Flask.txt",
+    "templates": 38
+  },
+  {
+    "package": "requests",
+    "repository": "psf/requests",
+    "commit": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+    "archive_sha256": "83a67e83356762c4dfac7e75387826178fbf1041e2d2cd57259f4a5593474aa3",
+    "license": "docs/catalog-licenses/requests.txt",
+    "templates": 18
+  },
+  {
+    "package": "FastAPI",
+    "repository": "fastapi/fastapi",
+    "commit": "94918c1d40afb27065c64d523219ed2ad9822f76",
+    "archive_sha256": "da352fa4cfe2175391b4c008830feb1b7a3be967aa5a4c9f174446443ee1d642",
+    "license": "docs/catalog-licenses/FastAPI.txt",
+    "templates": 12
+  }
+]

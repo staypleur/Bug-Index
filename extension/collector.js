@@ -1,5 +1,8 @@
 'use strict';
-const RULES = require('./errors.json').map(entry => new RegExp(entry.pattern, 'im'));
+// Library diagnostics are also covered by the shared traceback detector. Avoid
+// running thousands of library regexes just to decide whether to send a log.
+const RULES = require('./errors.json').filter(entry => !entry.context).map(entry => new RegExp(entry.pattern, 'im'));
+const DETECTORS = require('./diagnostics.json').map(entry => ({ rule: new RegExp(entry.pattern, 'm'), context: entry.context ? new RegExp(entry.context, 'm') : null }));
 function mask(text) {
   return text.replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, '')
     .replace(/\bBearer\s+[A-Za-z0-9._~+/=-]+/gi, 'Bearer [REDACTED]')
@@ -13,6 +16,10 @@ function mask(text) {
 function excerpt(output) {
   const clean = mask(output.replace(/\r\n/g, '\n'));
   const matches = RULES.map(rule => clean.match(rule)).filter(Boolean);
+  for (const detector of DETECTORS) if (!detector.context || detector.context.test(clean)) {
+    const match = clean.match(detector.rule);
+    if (match) matches.push(match);
+  }
   const match = matches.sort((a, b) => a.index - b.index)[0];
   if (!match) return null;
   const before = clean.slice(0, match.index), traceback = before.lastIndexOf('Traceback (most recent call last):');

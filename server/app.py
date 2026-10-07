@@ -8,11 +8,12 @@ from urllib.parse import urlencode, urlparse
 
 import httpx
 from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from .catalog import CATALOG, classify, fingerprint, mask, progression
+from .catalog import CATALOG, classify, diagnostic, fingerprint, mask, progression, public_entry
 from .db import connect, initialize
 
 BASE = os.environ.get("PUBLIC_URL", "http://localhost:8000").rstrip("/")
@@ -32,6 +33,7 @@ async def lifespan(app):
 
 
 app = FastAPI(title="Bug Index", lifespan=lifespan, docs_url=None, redoc_url=None)
+app.add_middleware(GZipMiddleware, minimum_size=1024, compresslevel=5)
 
 
 @app.middleware("http")
@@ -228,18 +230,31 @@ class Capture(BaseModel):
 @app.post("/api/capture")
 def capture(body: Capture, current=Depends(user)):
     classified = classify(body.log, body.language)
-    if not classified:
+    evidence = diagnostic(body.log, body.language) if not classified else None
+    if not classified and not evidence:
         return {"collected": False, "reason": "지원하는 오류 패턴을 찾지 못했습니다."}
     now = time.time()
     project = mask(body.project)
-    key = fingerprint(classified, project)
+    identity = classified or {'name': evidence['diagnostic'], **evidence}
+    key = fingerprint(identity, project)
     with connect() as db:
         db.execute("BEGIN IMMEDIATE")
         previous = db.execute("SELECT bug_id FROM occurrences WHERE user_id=? AND request_id=?", (current["id"], body.request_id)).fetchone()
         if previous:
             return {"collected": True, "duplicate": True, "bug_id": previous[0]}
-        if db.execute("SELECT count(*) FROM occurrences WHERE user_id=? AND occurred_at>?", (current["id"], now - 60)).fetchone()[0] >= 60:
+        previous_unknown = db.execute('SELECT unknown_id FROM unknown_occurrences WHERE user_id=? AND request_id=?', (current['id'], body.request_id)).fetchone()
+        if previous_unknown:
+            return {'collected': True, 'unclassified': True, 'duplicate': True, 'unknown_id': previous_unknown[0]}
+        count = db.execute('SELECT (SELECT count(*) FROM occurrences WHERE user_id=? AND occurred_at>?) + (SELECT count(*) FROM unknown_occurrences o JOIN unknown_bugs u ON u.id=o.unknown_id WHERE o.user_id=? AND o.occurred_at>? AND u.resolved_bug_id IS NULL)', (current['id'], now - 60, current['id'], now - 60)).fetchone()[0]
+        if count >= 60:
             raise HTTPException(429, "수집 요청이 너무 많습니다. 잠시 후 재시도해주세요.")
+        if not classified:
+            existing = db.execute('SELECT id FROM unknown_bugs WHERE user_id=? AND fingerprint=?', (current['id'], key)).fetchone()
+            db.execute('INSERT INTO unknown_bugs(user_id,fingerprint,project,language,diagnostic,first_seen,last_seen) VALUES(?,?,?,?,?,?,?) ON CONFLICT(user_id,fingerprint) DO UPDATE SET last_seen=excluded.last_seen', (current['id'], key, project, evidence['language'], evidence['diagnostic'], now, now))
+            unknown_id = db.execute('SELECT id FROM unknown_bugs WHERE user_id=? AND fingerprint=?', (current['id'], key)).fetchone()[0]
+            db.execute('INSERT INTO unknown_occurrences(user_id,unknown_id,request_id,log,occurred_at) VALUES(?,?,?,?,?)', (current['id'], unknown_id, body.request_id, evidence['log'], now))
+            return {'collected': True, 'unclassified': True, 'unknown_id': unknown_id,
+                    'new_case': not bool(existing), 'species': '미분류 발견', 'xp_earned': 0}
         existing = db.execute("SELECT id FROM bugs WHERE user_id=? AND fingerprint=?", (current["id"], key)).fetchone()
         db.execute("INSERT INTO bugs(user_id,species,family_id,fingerprint,project,first_seen,last_seen) VALUES(?,?,?,?,?,?,?) ON CONFLICT(user_id,fingerprint) DO UPDATE SET last_seen=excluded.last_seen", (current["id"], classified["id"], classified['family_id'], key, project, now, now))
         bug_id = db.execute("SELECT id FROM bugs WHERE user_id=? AND fingerprint=?", (current["id"], key)).fetchone()[0]
@@ -270,7 +285,7 @@ def collection(uid):
         number = entry['id']
         state = discovered.get(number, {"cases": 0, "encounters": 0, "xp": 0, "solved": 0})
         family = families.get(entry['family_id'], {'encounters': 0, 'xp': 0, 'solved': 0})
-        result.append({key: entry[key] for key in ('id', 'name', 'language', 'category', 'rarity', 'icon', 'label', 'family_id', 'family_name')} |
+        result.append(public_entry(entry) |
                       {**state, **progression(family['xp']), 'family_encounters': family['encounters'],
                        'family_solved': family['solved'], "discovered": number in discovered,
                        "mastered": number in discovered and family['encounters'] >= 5 and family['solved'] >= 3})
@@ -301,6 +316,84 @@ class Solution(BaseModel):
     solution: str = Field(default="", max_length=8000)
     memo: str = Field(default="", max_length=4000)
     solved: bool = False
+
+
+@app.get('/api/unknown')
+def unknown(offset: int = 0, current=Depends(user)):
+    offset = max(0, offset)
+    with connect() as db:
+        total = db.execute('SELECT count(*) FROM unknown_bugs WHERE user_id=? AND resolved_bug_id IS NULL', (current['id'],)).fetchone()[0]
+        rows = db.execute('''SELECT u.*,count(o.id) encounters FROM unknown_bugs u
+          LEFT JOIN unknown_occurrences o ON o.unknown_id=u.id
+          WHERE u.user_id=? AND u.resolved_bug_id IS NULL GROUP BY u.id
+          ORDER BY u.last_seen DESC,u.id DESC LIMIT 50 OFFSET ?''', (current['id'], offset)).fetchall()
+        items = []
+        for row in rows:
+            item = dict(row)
+            item.pop('user_id')
+            items.append(item)
+    return {'total': total, 'items': items, 'has_more': offset + len(items) < total}
+
+
+@app.get('/api/unknown/{unknown_id}')
+def unknown_detail(unknown_id: int, current=Depends(user)):
+    with connect() as db:
+        row = db.execute('SELECT * FROM unknown_bugs WHERE id=? AND user_id=?', (unknown_id, current['id'])).fetchone()
+        if not row:
+            raise HTTPException(404, '미분류 기록을 찾을 수 없습니다.')
+        item = dict(row)
+        item.pop('user_id')
+        item['occurrences'] = [dict(r) for r in db.execute('SELECT log,occurred_at FROM unknown_occurrences WHERE unknown_id=? ORDER BY occurred_at DESC LIMIT 20', (unknown_id,))]
+    return item
+
+
+@app.patch('/api/unknown/{unknown_id}')
+def save_unknown(unknown_id: int, body: Solution, current=Depends(user)):
+    cause, solution, memo = mask(body.cause).strip(), mask(body.solution).strip(), mask(body.memo).strip()
+    if body.solved and (not cause or not solution):
+        raise HTTPException(400, '해결 완료에는 원인과 해결 방법이 필요합니다.')
+    with connect() as db:
+        previous = db.execute('SELECT solved_at FROM unknown_bugs WHERE id=? AND user_id=?', (unknown_id, current['id'])).fetchone()
+        if not previous:
+            raise HTTPException(404, '미분류 기록을 찾을 수 없습니다.')
+        solved_at = (previous[0] or time.time()) if body.solved else None
+        db.execute('UPDATE unknown_bugs SET cause=?,solution=?,memo=?,solved_at=? WHERE id=? AND user_id=?', (cause, solution, memo, solved_at, unknown_id, current['id']))
+    return {'ok': True}
+
+
+@app.post('/api/unknown/{unknown_id}/reclassify')
+def reclassify_unknown(unknown_id: int, current=Depends(browser_user)):
+    with connect() as db:
+        db.execute('BEGIN IMMEDIATE')
+        item = db.execute('SELECT * FROM unknown_bugs WHERE id=? AND user_id=?', (unknown_id, current['id'])).fetchone()
+        if not item:
+            raise HTTPException(404, '미분류 기록을 찾을 수 없습니다.')
+        if item['resolved_bug_id']:
+            return {'classified': True, 'duplicate': True, 'bug_id': item['resolved_bug_id']}
+        occurrences = db.execute('SELECT * FROM unknown_occurrences WHERE unknown_id=? ORDER BY occurred_at', (unknown_id,)).fetchall()
+        classified = [classify(row['log'], item['language']) for row in occurrences]
+        if not classified or any(not bug for bug in classified):
+            return {'classified': False, 'reason': '아직 이 오류를 분류하는 규칙이 없습니다. 기록은 그대로 보관됩니다.'}
+        keys = {fingerprint(bug, item['project']) for bug in classified}
+        if len({bug['id'] for bug in classified}) != 1 or len(keys) != 1:
+            return {'classified': False, 'reason': '기록들이 서로 다른 오류로 분류되어 자동으로 합칠 수 없습니다.'}
+        bug, key = classified[0], keys.pop()
+        existing = db.execute('SELECT * FROM bugs WHERE user_id=? AND fingerprint=?', (current['id'], key)).fetchone()
+        if not existing:
+            db.execute('''INSERT INTO bugs(user_id,species,family_id,fingerprint,project,first_seen,last_seen,cause,solution,memo,solved_at)
+              VALUES(?,?,?,?,?,?,?,?,?,?,?)''', (current['id'], bug['id'], bug['family_id'], key, item['project'], item['first_seen'], item['last_seen'], item['cause'], item['solution'], item['memo'], item['solved_at']))
+        else:
+            # Merge notes rather than silently replacing an existing solution.
+            notes = []
+            for field in ('cause', 'solution', 'memo'):
+                previous, incoming = existing[field], item[field]
+                notes.append(previous if not incoming or incoming == previous else previous + '\n\n[미분류 기록에서 가져옴]\n' + incoming if previous else incoming)
+            db.execute('UPDATE bugs SET first_seen=min(first_seen,?),last_seen=max(last_seen,?),cause=?,solution=?,memo=?,solved_at=coalesce(solved_at,?) WHERE id=?', (item['first_seen'], item['last_seen'], *notes, item['solved_at'], existing['id']))
+        bug_id = db.execute('SELECT id FROM bugs WHERE user_id=? AND fingerprint=?', (current['id'], key)).fetchone()[0]
+        for row in occurrences:
+            db.execute('INSERT INTO occurrences(user_id,bug_id,request_id,log,occurred_at,xp) VALUES(?,?,?,?,?,0)', (current['id'], bug_id, row['request_id'], row['log'], row['occurred_at']))
+        db.execute('UPDATE unknown_bugs SET resolved_bug_id=? WHERE id=?', (bug_id, unknown_id))
+    return {'classified': True, 'bug_id': bug_id, 'species': bug['name']}
 
 
 @app.patch("/api/cases/{bug_id}")
@@ -351,9 +444,12 @@ def export(current=Depends(browser_user)):
     with connect() as db:
         bugs = [dict(r) for r in db.execute("SELECT * FROM bugs WHERE user_id=?", (current["id"],))]
         occurrences = [dict(r) for r in db.execute("SELECT * FROM occurrences WHERE user_id=?", (current["id"],))]
-    for row in bugs + occurrences:
+        unknown_bugs = [dict(r) for r in db.execute('SELECT * FROM unknown_bugs WHERE user_id=?', (current['id'],))]
+        unknown_occurrences = [dict(r) for r in db.execute('SELECT * FROM unknown_occurrences WHERE user_id=?', (current['id'],))]
+    for row in bugs + occurrences + unknown_bugs + unknown_occurrences:
         row.pop("user_id", None)
-    return JSONResponse({"version": 1, "login": current["login"], "bugs": bugs, "occurrences": occurrences}, headers={"Content-Disposition": 'attachment; filename="bug-index-export.json"'})
+    return JSONResponse({"version": 2, "login": current["login"], "bugs": bugs, "occurrences": occurrences,
+                         'unknown_bugs': unknown_bugs, 'unknown_occurrences': unknown_occurrences}, headers={"Content-Disposition": 'attachment; filename="bug-index-export.json"'})
 
 
 app.mount("/", StaticFiles(directory=Path(__file__).parent.parent / "web", html=True), name="web")
