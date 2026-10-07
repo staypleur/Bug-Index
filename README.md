@@ -7,9 +7,9 @@ C · Python · Java 오류를 VS Code 터미널에서 수집합니다.
 
 - GitHub 로그인과 사용자별 독립된 수집 기록
 - VS Code 셸 통합 기반 자동 수집, 작업 공간별 수집 켜기/끄기
-- 21종의 오류 패턴 분류, 수동 로그 등록, 검색·언어 필터·정렬
+- 225개의 오류 분류 항목(C 54 / Python 87 / Java 84), 수동 로그 등록, 검색·언어·계열 필터·정렬
 - 프로젝트·소스 위치·함수 기반 SHA-256 fingerprint와 재발 기록
-- 종류별 경험치·레벨, 개별 버그별 원인·해결 방법·학습 메모
+- 세부종류별 수집과 오류 계열별 공유 경험치·레벨, 개별 버그별 원인·해결 방법·학습 메모
 - 마스터 조건: 해당 오류 종류 조우 5회 이상 + 서로 다른 버그 3건 해결
 - Pro: 언어·프로젝트·일별 통계, 상위 오류, 공개 동의한 헌터 랭킹
 - 토큰 발급/폐기, 로그 마스킹, 오프라인 수집 재시도, 개인 데이터 내보내기
@@ -61,7 +61,7 @@ Node.js 22 이상과 npm이 필요합니다.
 ```bash
 cd extension
 npx @vscode/vsce package
-code --install-extension bug-index-0.1.0.vsix
+code --install-extension bug-index-0.2.0.vsix
 ```
 
 1. 웹의 **VS Code 연결** 화면에서 수집 토큰을 발급합니다.
@@ -77,7 +77,7 @@ code --install-extension bug-index-0.1.0.vsix
 
 - VS Code 1.93 이상과 [터미널 셸 통합](https://code.visualstudio.com/docs/terminal/shell-integration)이 필요합니다.
 - 현재 터미널에서 시작한 명령의 출력을 감지합니다. Debug Console, Output 패널, Visual Studio는 아직 지원하지 않습니다.
-- 미리 정의한 패턴만 분류합니다. 정상 로그에 오류 문자열을 출력하는 경우도 감지될 수 있습니다.
+- 미리 정의한 영어 진단 패턴만 분류합니다. 정상 로그에 실제 진단 형식의 문자열을 출력하는 경우도 감지될 수 있습니다.
 - C의 메모리 누수·버퍼 오버플로는 AddressSanitizer/LeakSanitizer 진단 출력이 있어야 수집됩니다.
 - 한 실행의 오류 문맥을 한 건으로 수집합니다. 복수 오류를 완전히 분리하는 파서는 후속 작업입니다.
 - 서버 연결 실패 시 최대 50건을 VS Code SecretStorage에 보관하고 30초마다 재시도합니다.
@@ -87,11 +87,11 @@ code --install-extension bug-index-0.1.0.vsix
 
 ## 성장과 랭킹
 
-- 각 오류 종류의 XP를 합산합니다. 서로 다른 파일에서 발생해도 같은 종류의 레벨이 오릅니다.
+- 같은 오류 계열의 XP를 합산합니다. 예를 들어 TypeError의 피연산자 타입 불일치와 호출 불가 객체는 서로 다른 카드로 수집되지만 TypeError 계열의 레벨을 공유합니다.
 - 레벨 L 진입에 필요한 누적 XP는 `5 × (L−1)²`입니다. Lv.2: 5, Lv.3: 20, Lv.4: 45 XP.
-- 같은 오류 종류는 1분에 최대 1 XP를 받습니다. 조우 기록은 모두 보관합니다.
+- 같은 오류 계열은 1분에 최대 1 XP를 받습니다. 세부종류를 바꿔도 쿨다운을 우회하지 못하며 조우 기록은 모두 보관합니다.
 - 해결은 원인과 해결 방법을 모두 기록해야 완료할 수 있습니다.
-- 랭킹 점수는 `현재 해결된 고유 버그 수 × 100 + 마스터한 오류 종류 수 × 500`입니다.
+- 랭킹 점수는 `현재 해결된 고유 버그 수 × 100 + 마스터한 오류 계열 수 × 500`입니다. 같은 계열의 세부카드가 여러 개여도 마스터 점수는 한 번만 계산합니다.
 - 해결 상태를 반복 변경해도 추가 점수가 누적되지 않습니다.
 - 랭킹 공개는 기본 비활성입니다. GitHub 사용자명과 점수만 공개하고, 로그·프로젝트·해결 메모는 공개하지 않습니다.
 - 실제 해결 여부는 사용자가 기록하므로 경쟁 랭킹의 진위 검증은 아직 제공하지 않습니다.
@@ -107,6 +107,7 @@ code --install-extension bug-index-0.1.0.vsix
 ```bash
 pip install -r requirements.lock pytest==9.0.2
 python -m pytest -q
+python -m scripts.build_catalog --check
 node --test extension/*.test.js
 ```
 
@@ -114,6 +115,13 @@ Windows 환경에서 임시 폴더 접근 제한이 있다면 `--basetemp .pytes
 GitHub Actions는 API·확장 테스트, JavaScript 문법 검사, Docker 이미지 빌드를 실행합니다.
 OAuth 테스트는 외부 GitHub 요청을 모의 처리합니다. VS Code 확장 런타임 테스트도 API를 모의 처리하므로
 설치된 VS Code와 실제 GitHub 계정에서의 최종 검증이 별도로 필요합니다.
+
+## 오류 세분화
+
+[분류 목록과 확장 방법](docs/catalog.md)을 참고하세요. 기존 21개 통합 분류의 번호는 유지하고,
+Python 내장 예외, Java 표준 예외, C/Java 컴파일 오류와 C sanitizer 진단을 추가했습니다.
+NumPy, pandas, Spring 등 외부 라이브러리는 이번 확장에 포함하지 않았습니다.
+225개는 통합 분류와 세부종류를 합한 지원 항목 수이며, 전체 가능한 버그 수를 뜻하지 않습니다.
 
 ## 남은 출시 결정
 

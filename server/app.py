@@ -241,13 +241,14 @@ def capture(body: Capture, current=Depends(user)):
         if db.execute("SELECT count(*) FROM occurrences WHERE user_id=? AND occurred_at>?", (current["id"], now - 60)).fetchone()[0] >= 60:
             raise HTTPException(429, "수집 요청이 너무 많습니다. 잠시 후 재시도해주세요.")
         existing = db.execute("SELECT id FROM bugs WHERE user_id=? AND fingerprint=?", (current["id"], key)).fetchone()
-        db.execute("INSERT INTO bugs(user_id,species,fingerprint,project,first_seen,last_seen) VALUES(?,?,?,?,?,?) ON CONFLICT(user_id,fingerprint) DO UPDATE SET last_seen=excluded.last_seen", (current["id"], classified["id"], key, project, now, now))
+        db.execute("INSERT INTO bugs(user_id,species,family_id,fingerprint,project,first_seen,last_seen) VALUES(?,?,?,?,?,?,?) ON CONFLICT(user_id,fingerprint) DO UPDATE SET last_seen=excluded.last_seen", (current["id"], classified["id"], classified['family_id'], key, project, now, now))
         bug_id = db.execute("SELECT id FROM bugs WHERE user_id=? AND fingerprint=?", (current["id"], key)).fetchone()[0]
         # Store encounters, but grant at most one XP per species each minute.
-        recent = db.execute("SELECT 1 FROM occurrences o JOIN bugs b ON b.id=o.bug_id WHERE o.user_id=? AND b.species=? AND o.xp=1 AND o.occurred_at>? LIMIT 1", (current["id"], classified["id"], now - 60)).fetchone()
+        recent = db.execute("SELECT 1 FROM occurrences o JOIN bugs b ON b.id=o.bug_id WHERE o.user_id=? AND b.family_id=? AND o.xp=1 AND o.occurred_at>? LIMIT 1", (current["id"], classified['family_id'], now - 60)).fetchone()
         xp = 0 if recent else 1
         db.execute("INSERT INTO occurrences(user_id,bug_id,request_id,log,occurred_at,xp) VALUES(?,?,?,?,?,?)", (current["id"], bug_id, body.request_id, classified["log"], now, xp))
-    return {"collected": True, "bug_id": bug_id, "new_case": not bool(existing), "species": classified["name"], "xp_earned": xp}
+    display = classified['family_name'] + ' · ' + classified['label'] if classified['family_id'] != classified['id'] else classified['name']
+    return {"collected": True, "bug_id": bug_id, "new_case": not bool(existing), "species": display, "xp_earned": xp}
 
 
 def collection(uid):
@@ -258,13 +259,21 @@ def collection(uid):
           min(b.first_seen) first_seen, max(b.last_seen) last_seen
           FROM bugs b LEFT JOIN occurrences o ON o.bug_id=b.id
           WHERE b.user_id=? GROUP BY b.species''', (uid,)).fetchall()
+        families = {r['family_id']: dict(r) for r in db.execute('''SELECT b.family_id,
+          count(o.id) encounters,coalesce(sum(o.xp),0) xp,
+          count(DISTINCT CASE WHEN b.solved_at IS NOT NULL THEN b.id END) solved
+          FROM bugs b LEFT JOIN occurrences o ON o.bug_id=b.id
+          WHERE b.user_id=? GROUP BY b.family_id''', (uid,))}
     discovered = {row["species"]: dict(row) for row in rows}
     result = []
-    for number, (name, language, category, rarity, icon, _) in enumerate(CATALOG, 1):
+    for entry in CATALOG:
+        number = entry['id']
         state = discovered.get(number, {"cases": 0, "encounters": 0, "xp": 0, "solved": 0})
-        result.append({"id": number, "name": name, "language": language, "category": category, "rarity": rarity, "icon": icon,
-                       **state, **progression(state["xp"]), "discovered": number in discovered,
-                       "mastered": state["encounters"] >= 5 and state["solved"] >= 3})
+        family = families.get(entry['family_id'], {'encounters': 0, 'xp': 0, 'solved': 0})
+        result.append({key: entry[key] for key in ('id', 'name', 'language', 'category', 'rarity', 'icon', 'label', 'family_id', 'family_name')} |
+                      {**state, **progression(family['xp']), 'family_encounters': family['encounters'],
+                       'family_solved': family['solved'], "discovered": number in discovered,
+                       "mastered": number in discovered and family['encounters'] >= 5 and family['solved'] >= 3})
     return result
 
 
@@ -323,9 +332,9 @@ def ranking(current=Depends(pro)):
     with connect() as db:
         # Aggregate counts in SQL rather than exposing any user's logs or projects.
         rows = db.execute('''WITH per_species AS (
-          SELECT b.user_id,b.species,count(o.id) encounters,
+          SELECT b.user_id,b.family_id,count(o.id) encounters,
           count(DISTINCT CASE WHEN b.solved_at IS NOT NULL THEN b.id END) solved
-          FROM bugs b LEFT JOIN occurrences o ON o.bug_id=b.id GROUP BY b.user_id,b.species
+          FROM bugs b LEFT JOIN occurrences o ON o.bug_id=b.id GROUP BY b.user_id,b.family_id
         ), scores AS (
           SELECT user_id,sum(solved) solved,
           sum(CASE WHEN encounters>=5 AND solved>=3 THEN 1 ELSE 0 END) mastered

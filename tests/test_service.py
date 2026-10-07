@@ -187,3 +187,48 @@ def test_export_only_current_user(client):
     exported = client.get('/api/export').json()
     assert len(exported['bugs']) == 1 and len(exported['occurrences']) == 1
     assert exported['bugs'][0]['project'] == 'test'
+
+
+def test_subtypes_share_xp_cooldown_and_family_level(client, monkeypatch):
+    clock = time.time()
+    monkeypatch.setattr('server.app.time.time', lambda: clock)
+    first = capture(client, log="TypeError: unsupported operand type(s) for +: 'int' and 'str'").json()
+    second = capture(client, log="TypeError: 'int' object is not callable").json()
+    assert first['xp_earned'] == 1 and second['xp_earned'] == 0
+    for n in range(1, 5):
+        clock += 61
+        capture(client, log="TypeError: 'int' object is not callable", project=f'project-{n}')
+    bugs = client.get('/api/collection').json()
+    subtypes = [b for b in bugs if b['discovered'] and b['family_id'] == 9]
+    assert len(subtypes) == 2
+    assert all(b['level'] == 2 and b['xp'] == 5 for b in subtypes)
+    assert sum(b['encounters'] for b in subtypes) == 6
+    assert all(b['family_encounters'] == 6 for b in subtypes)
+
+
+def test_family_mastery_and_ranking_count_each_family_once(client):
+    diagnostics = [
+        "TypeError: unsupported operand type(s) for +: 'int' and 'str'",
+        "TypeError: 'int' object is not callable",
+        "TypeError: 'NoneType' object is not subscriptable",
+    ]
+    ids = [capture(client, log=log).json()['bug_id'] for log in diagnostics]
+    for _ in range(2): capture(client, log=diagnostics[0])
+    for bug_id in ids:
+        client.patch(f'/api/cases/{bug_id}', json={'cause': 'incorrect type', 'solution': 'validate input', 'solved': True})
+    collection = client.get('/api/collection').json()
+    mastered = [b for b in collection if b['mastered']]
+    assert len(mastered) == 3 and {b['family_id'] for b in mastered} == {9}
+    assert all(b['family_solved'] == 3 for b in mastered)
+    with connect() as db: db.execute('UPDATE users SET pro=1,ranking_opt_in=1')
+    score = client.get('/api/ranking').json()[0]
+    assert score['mastered'] == 1 and score['score'] == 800
+
+
+def test_unknown_messages_remain_generic_and_keep_catalog_ids(client):
+    capture(client, log='TypeError: a custom diagnostic')
+    entries = client.get('/api/collection').json()
+    generic = next(e for e in entries if e['id'] == 9)
+    assert generic['name'] == 'TypeError' and generic['discovered']
+    assert len(entries) == 225
+    assert {e['id'] for e in entries} >= set(range(1, 22))

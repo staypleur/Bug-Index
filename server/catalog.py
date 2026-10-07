@@ -1,31 +1,13 @@
 """Deterministic classification. Never claim to diagnose errors we cannot identify."""
 import hashlib
+import json
 import math
 import re
+from pathlib import Path
 
-CATALOG = [
-    ("NullPointerException", "Java", "Runtime", "Uncommon", "🪲", r"\bNullPointerException\b"),
-    ("ArrayIndexOutOfBoundsException", "Java", "Runtime", "Uncommon", "🐜", r"\bArrayIndexOutOfBoundsException\b"),
-    ("ClassNotFoundException", "Java", "Dependency", "Uncommon", "🦗", r"\bClassNotFoundException\b"),
-    ("IllegalArgumentException", "Java", "Runtime", "Common", "🐞", r"\bIllegalArgumentException\b"),
-    ("StackOverflowError", "Java", "Memory", "Rare", "🕷", r"\bStackOverflowError\b"),
-    ("OutOfMemoryError", "Java", "Memory", "Epic", "🦂", r"\bOutOfMemoryError\b"),
-    ("JavaCompileError", "Java", "Build", "Common", "🐝", r"\.java:\d+:\s*error:"),
-    ("SyntaxError", "Python", "Syntax", "Common", "🐛", r"(?:^|\n)\s*(?:SyntaxError|IndentationError|TabError):"),
-    ("TypeError", "Python", "Runtime", "Common", "🐞", r"(?:^|\n)\s*TypeError:"),
-    ("NameError", "Python", "Runtime", "Common", "🐜", r"(?:^|\n)\s*NameError:"),
-    ("IndexError", "Python", "Runtime", "Uncommon", "🪲", r"(?:^|\n)\s*IndexError:"),
-    ("KeyError", "Python", "Runtime", "Uncommon", "🦗", r"(?:^|\n)\s*KeyError:"),
-    ("ZeroDivisionError", "Python", "Runtime", "Common", "🐝", r"(?:^|\n)\s*ZeroDivisionError:"),
-    ("ModuleNotFoundError", "Python", "Dependency", "Uncommon", "🦋", r"(?:^|\n)\s*(?:ModuleNotFoundError|ImportError):"),
-    ("ValueError", "Python", "Runtime", "Common", "🐛", r"(?:^|\n)\s*ValueError:"),
-    ("Segmentation Fault", "C", "Memory", "Rare", "🦂", r"segmentation fault|sigsegv|access violation"),
-    ("Buffer Overflow", "C", "Memory", "Epic", "🕷", r"(?:heap|stack|global)-buffer-overflow|stack smashing detected"),
-    ("Use After Free", "C", "Memory", "Epic", "🦂", r"heap-use-after-free"),
-    ("Memory Leak", "C", "Memory", "Epic", "🦋", r"LeakSanitizer: detected memory leaks"),
-    ("CCompileError", "C", "Build", "Common", "🐝", r"\.(?:c|h):\d+(?::\d+)?:\s*(?:fatal )?error:"),
-    ("Undefined Reference", "C", "Build", "Uncommon", "🦗", r"undefined reference to|Undefined symbols for architecture"),
-]
+CATALOG = json.loads(Path(__file__).with_name('errors.json').read_text(encoding='utf-8'))
+BY_ID = {entry['id']: entry for entry in CATALOG}
+RULES = [(entry, re.compile(entry['pattern'], re.I | re.M)) for entry in CATALOG]
 
 
 def mask(text):
@@ -41,18 +23,21 @@ def mask(text):
 
 
 def classify(raw, language=None):
-    clean = mask(raw)
+    clean = mask(raw.replace('\r\n', '\n').replace('\r', '\n'))
     found = []
-    for number, (name, lang, category, rarity, icon, pattern) in enumerate(CATALOG, 1):
-        if language and language != lang:
+    for entry, pattern in RULES:
+        if language and language != entry['language']:
             continue
-        for match in re.finditer(pattern, clean, re.I):
-            found.append((match.start(), number, name, lang, category, rarity, icon))
+        for match in pattern.finditer(clean):
+            # Multiple rules can describe the same diagnostic. Prefer the specific
+            # one on that line; chained errors use the final diagnostic line.
+            line = clean.count('\n', 0, match.start())
+            found.append((line, entry['priority'], entry['id']))
     if not found:
         return None
-    _, number, name, lang, category, rarity, icon = max(found)
-    return {"id": number, "name": name, "language": lang, "category": category,
-            "rarity": rarity, "icon": icon, "log": clean}
+    _, _, number = max(found)
+    entry = BY_ID[number]
+    return {key: entry[key] for key in ('id', 'name', 'language', 'category', 'rarity', 'icon', 'label', 'family_id', 'family_name')} | {'log': clean}
 
 
 def fingerprint(bug, project):

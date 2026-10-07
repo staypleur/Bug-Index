@@ -1,5 +1,5 @@
 'use strict';
-const PATTERN = /(?:\b(?:NullPointerException|ArrayIndexOutOfBoundsException|ClassNotFoundException|IllegalArgumentException|StackOverflowError|OutOfMemoryError)\b|\.java:\d+:\s*error:|(?:^|\n)\s*(?:SyntaxError|IndentationError|TabError|TypeError|NameError|IndexError|KeyError|ZeroDivisionError|ModuleNotFoundError|ImportError|ValueError):|segmentation fault|sigsegv|access violation|(?:heap|stack|global)-buffer-overflow|stack smashing detected|heap-use-after-free|LeakSanitizer: detected memory leaks|\.(?:c|h):\d+(?::\d+)?:\s*(?:fatal )?error:|undefined reference to|Undefined symbols for architecture)/i;
+const RULES = require('./errors.json').map(entry => new RegExp(entry.pattern, 'im'));
 function mask(text) {
   return text.replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, '')
     .replace(/\bBearer\s+[A-Za-z0-9._~+/=-]+/gi, 'Bearer [REDACTED]')
@@ -12,7 +12,8 @@ function mask(text) {
 }
 function excerpt(output) {
   const clean = mask(output.replace(/\r\n/g, '\n'));
-  const match = clean.match(PATTERN);
+  const matches = RULES.map(rule => clean.match(rule)).filter(Boolean);
+  const match = matches.sort((a, b) => a.index - b.index)[0];
   if (!match) return null;
   const before = clean.slice(0, match.index), traceback = before.lastIndexOf('Traceback (most recent call last):');
   const start = traceback >= 0 ? traceback : Math.max(0, before.lastIndexOf('\n', Math.max(0, before.length - 2)) + 1);

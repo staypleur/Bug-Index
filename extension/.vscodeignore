@@ -1,5 +1,6 @@
 collector.test.js
 runtime.test.js
+catalog.test.js
 .vscode/**
 node_modules/**
 *.vsix

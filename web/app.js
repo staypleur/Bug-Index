@@ -1,6 +1,6 @@
 'use strict';
 const $ = selector => document.querySelector(selector);
-const state = { user: null, bugs: [], filter: 'all', view: 'dex' };
+const state = { user: null, bugs: [], filter: 'all', view: 'dex', limit: 24 };
 const el = (tag, className, text) => { const node = document.createElement(tag); if (className) node.className = className; if (text !== undefined) node.textContent = text; return node; };
 let toastTimer;
 function toast(message) { $('#toast').textContent = message; $('#toast').classList.remove('hidden'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('#toast').classList.add('hidden'), 6000); }
@@ -17,7 +17,7 @@ async function refresh() {
   $('#total').textContent = discovered.length;
   $('#encounters').textContent = state.bugs.reduce((a, b) => a + b.encounters, 0);
   $('#solved').textContent = state.bugs.reduce((a, b) => a + b.solved, 0);
-  $('#mastered').textContent = state.bugs.filter(b => b.mastered).length;
+  $('#mastered').textContent = new Set(state.bugs.filter(b => b.mastered).map(b => b.family_id)).size;
   $('#collection-count').textContent = `${discovered.length} / ${state.bugs.length}`;
   $('#nav-count').textContent = discovered.length;
   $('#total-caption').textContent = discovered.length ? `${state.bugs.length}종 중 ${Math.round(discovered.length / state.bugs.length * 100)}% 발견` : '도감의 첫 페이지를 채워보세요';
@@ -25,21 +25,23 @@ async function refresh() {
 }
 function renderCards() {
   const query = $('#search').value.trim().toLowerCase(), language = $('#language').value;
-  let bugs = state.bugs.filter(b => (!language || b.language === language) && (!query || [b.name, b.category, b.language].join(' ').toLowerCase().includes(query)) &&
+  let bugs = state.bugs.filter(b => (!language || b.language === language) && (!$('#family').value || String(b.family_id) === $('#family').value) && (!query || [b.name, b.label, b.family_name, b.category, b.language].join(' ').toLowerCase().includes(query)) &&
     (state.filter === 'all' || (state.filter === 'discovered' && b.discovered) || (state.filter === 'mastered' && b.mastered) || (state.filter === 'unknown' && !b.discovered)));
   const sort = $('#sort').value;
   bugs.sort((a, b) => sort === 'level' ? b.level - a.level || b.encounters - a.encounters : sort === 'name' ? a.name.localeCompare(b.name) : (b.last_seen || 0) - (a.last_seen || 0) || a.id - b.id);
   $('#cards').replaceChildren();
   $('#empty-search').classList.toggle('hidden', !!bugs.length);
-  for (const bug of bugs) {
+  $('#more-cards').classList.toggle('hidden', bugs.length <= state.limit);
+  $('#more-cards').textContent = `더 보기 · ${Math.min(state.limit, bugs.length)} / ${bugs.length}`;
+  for (const bug of bugs.slice(0, state.limit)) {
     const card = el(bug.discovered ? 'button' : 'div', `bug-card ${bug.discovered ? '' : 'unknown'}`);
     const top = el('div', 'card-top'); top.append(el('span', '', `NO. ${String(bug.id).padStart(3, '0')}`), el('span', `rarity ${bug.rarity}`, bug.rarity.toUpperCase()));
-    card.append(top, el('div', 'creature', bug.discovered ? bug.icon : '?'), el('h3', '', bug.discovered ? bug.name : '??????????'));
-    const meta = el('div', 'bug-meta'); meta.append(el('b', '', bug.language), el('span', '', '·'), document.createTextNode(bug.discovered ? bug.category : '아직 만나지 않은 버그'));
+    card.append(top, el('div', 'creature', bug.discovered ? bug.icon : '?'), el('h3', '', bug.discovered ? bug.label : '??????????'));
+    const meta = el('div', 'bug-meta'); meta.append(el('b', '', bug.language), el('span', '', '·'), document.createTextNode(bug.discovered ? `${bug.family_name} / ${bug.category}` : '아직 만나지 않은 버그'));
     card.append(meta);
     const bottom = el('div', 'card-bottom'); bottom.append(el('span', 'level', bug.discovered ? `Lv. ${bug.level}` : 'UNDISCOVERED'), el('span', '', bug.discovered ? `조우 ${bug.encounters}회 · 해결 ${bug.solved}건` : '다음 만남을 기다리고 있어요'));
     card.append(bottom);
-    if (bug.discovered) { const xp = el('div', 'xp'); const fill = el('i'); fill.style.width = `${bug.progress * 100}%`; xp.append(fill); card.append(xp); card.setAttribute('aria-label', `${bug.name}, 레벨 ${bug.level}, 조우 ${bug.encounters}회`); card.addEventListener('click', () => showDetail(bug).catch(e => toast(e.message))); }
+    if (bug.discovered) { const xp = el('div', 'xp'); const fill = el('i'); fill.style.width = `${bug.progress * 100}%`; xp.append(fill); card.append(xp); card.setAttribute('aria-label', `${bug.family_name} ${bug.label}, 레벨 ${bug.level}, 조우 ${bug.encounters}회`); card.addEventListener('click', () => showDetail(bug).catch(e => toast(e.message))); }
     if (bug.mastered) card.append(el('span', 'master-tag', '✧ MASTER'));
     $('#cards').append(card);
   }
@@ -47,8 +49,8 @@ function renderCards() {
 async function showDetail(bug) {
   const cases = await api(`/api/species/${bug.id}/cases`);
   $('#detail-number').textContent = `BUG INDEX / NO. ${String(bug.id).padStart(3, '0')}`;
-  $('#detail-title').textContent = `${bug.icon} ${bug.name}`;
-  $('#detail-summary').textContent = `Lv. ${bug.level} · ${bug.xp}/${bug.next_level_xp} XP · 조우 ${bug.encounters}회 · 해결 ${bug.solved}건 · ${bug.mastered ? 'MASTER' : '마스터 조건: 조우 5회 + 서로 다른 버그 3건 해결'}`;
+  $('#detail-title').textContent = `${bug.icon} ${bug.family_id === bug.id ? bug.name : bug.family_name + ' · ' + bug.label}`;
+  $('#detail-summary').textContent = `계열 Lv. ${bug.level} · ${bug.xp}/${bug.next_level_xp} XP · 이 종류 조우 ${bug.encounters}회 / 해결 ${bug.solved}건 · 계열 전체 조우 ${bug.family_encounters}회 / 해결 ${bug.family_solved}건 · ${bug.mastered ? 'MASTER' : '마스터 조건: 같은 계열 조우 5회 + 서로 다른 버그 3건 해결'}`;
   $('#detail-cases').replaceChildren();
   for (const item of cases) {
     const form = el('form', 'case');
@@ -103,8 +105,9 @@ async function loadTokens() {
   for (const token of tokens) { const row = el('div', 'token-row'); row.append(el('span', '', `${token.label} · ${date(token.created)}`)); const revoke = el('button', 'quiet', '폐기'); revoke.addEventListener('click', async () => { try { await api(`/api/tokens/${token.digest}`, { method: 'DELETE', body: '{}' }); await loadTokens(); toast('토큰을 폐기했습니다.'); } catch (e) { toast(e.message); } }); row.append(revoke); $('#token-list').append(row); }
 }
 for (const nav of document.querySelectorAll('.nav')) nav.addEventListener('click', () => { if (state.user) showView(nav.dataset.view).catch(e => toast(e.message)); });
-for (const button of document.querySelectorAll('[data-filter]')) button.addEventListener('click', () => { state.filter = button.dataset.filter; for (const tab of document.querySelectorAll('[data-filter]')) tab.classList.toggle('selected', tab === button); renderCards(); });
-for (const selector of ['#search', '#language', '#sort']) $(selector).addEventListener(selector === '#search' ? 'input' : 'change', renderCards);
+for (const button of document.querySelectorAll('[data-filter]')) button.addEventListener('click', () => { state.filter = button.dataset.filter; state.limit = 24; for (const tab of document.querySelectorAll('[data-filter]')) tab.classList.toggle('selected', tab === button); renderCards(); });
+for (const selector of ['#search', '#language', '#family', '#sort']) $(selector).addEventListener(selector === '#search' ? 'input' : 'change', () => { state.limit = 24; renderCards(); });
+$('#more-cards').addEventListener('click', () => { state.limit += 24; renderCards(); });
 for (const button of document.querySelectorAll('[data-close]')) button.addEventListener('click', () => document.getElementById(button.dataset.close).close());
 document.addEventListener('keydown', event => { if (event.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName) && state.view === 'dex' && state.user && !document.querySelector('dialog[open]')) { event.preventDefault(); $('#search').focus(); } });
 $('#capture-open').addEventListener('click', () => $('#capture-dialog').showModal());
@@ -120,7 +123,10 @@ async function start() {
   $('#username').textContent = state.user.login;
   $('#plan-label').textContent = state.user.pro ? 'PRO PLAN · 고급 통계 & 랭킹' : 'FREE PLAN · 기본 도감';
   $('#logout').classList.remove('hidden'); $('#ranking-opt-in').checked = state.user.ranking_opt_in;
-  await refresh(); await showView('dex');
+  await refresh();
+  const families = new Map(state.bugs.map(b => [b.family_id, { name: b.family_name, language: b.language }]));
+  for (const [id, family] of [...families].sort((a, b) => a[1].name.localeCompare(b[1].name))) { const option = el('option', '', `${family.language} · ${family.name}`); option.value = id; $('#family').append(option); }
+  await showView('dex');
 }
 start().catch(e => toast(`서비스 연결을 확인해주세요. ${e.message}`));
 setInterval(() => {

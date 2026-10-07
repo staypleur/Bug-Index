@@ -55,3 +55,10 @@ def initialize():
         CREATE INDEX IF NOT EXISTS bugs_owner ON bugs(user_id, species);
         CREATE INDEX IF NOT EXISTS occurrences_bug ON occurrences(bug_id, occurred_at);
         ''')
+        columns = {row['name'] for row in db.execute('PRAGMA table_info(bugs)')}
+        if 'family_id' not in columns:
+            db.execute('ALTER TABLE bugs ADD COLUMN family_id INTEGER')
+            # The initial catalog only contained root types. Preserve their
+            # IDs, XP, solutions and fingerprints when adding subdivisions.
+            db.execute('UPDATE bugs SET family_id=species WHERE family_id IS NULL')
+        db.execute('CREATE INDEX IF NOT EXISTS bugs_family ON bugs(user_id,family_id)')

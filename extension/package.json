@@ -2,7 +2,7 @@
   "name": "bug-index",
   "displayName": "Bug Index",
   "description": "Collect C, Python and Java terminal errors in your personal Bug Index.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "staypleur",
   "license": "UNLICENSED",
   "repository": { "type": "git", "url": "https://github.com/staypleur/Bug-Index.git", "directory": "extension" },
