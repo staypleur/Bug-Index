@@ -45,6 +45,8 @@ cppcheck --language=c --quiet --error-exitcode=2 --template='{file}:{line}:{colu
 
 일반 경고·스타일 제안은 수집하지 않습니다. 오류로 승격된 컴파일 진단은 실제 `error:` 출력이면 수집합니다.
 Cppcheck는 `error` 등급과 출력된 안정 ID로 구분합니다.
+GCC·Clang·LLD·Sanitizer의 세부 메시지는 영어 출력 기준입니다. 필요한 경우 `LC_ALL=C` 환경에서 실행합니다.
+MSVC는 메시지 내용보다 오류 코드를 기준으로 구분합니다.
 
 메모리 및 런타임 검사는 계측 옵션으로 빌드한 실행 파일에서 확인합니다.
 
