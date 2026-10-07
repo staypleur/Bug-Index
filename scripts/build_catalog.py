@@ -372,7 +372,10 @@ def main():
             parser.error('Shared diagnostic detectors are out of sync')
     else:
         detector_path.write_text(detectors, encoding='utf-8')
-    notices = '\n\n'.join(path.read_text(encoding='utf-8') for path in sorted((ROOT / 'docs/catalog-licenses').glob('*.txt')))
+    # Path ordering is case-insensitive on Windows, case-sensitive on Linux.
+    # Use the same explicit ordering on both hosts so --check is reproducible.
+    licenses = sorted((ROOT / 'docs/catalog-licenses').glob('*.txt'), key=lambda path: path.name.casefold())
+    notices = '\n\n'.join(path.read_text(encoding='utf-8') for path in licenses)
     notice_path = ROOT / 'extension/THIRD_PARTY_NOTICES.txt'
     if args.check:
         if not notice_path.exists() or notice_path.read_text(encoding='utf-8') != notices:
